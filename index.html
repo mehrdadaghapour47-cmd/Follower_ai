@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Follower AI</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b0f19;
+      color: #fff;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 25px 18px;
+    }
+    h1 { text-align: center; margin-bottom: 8px; }
+    .subtitle {
+      text-align: center;
+      color: #aab2c5;
+      margin-bottom: 25px;
+    }
+    .card {
+      background: #151b29;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #cbd3e1;
+    }
+    input, select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #30394d;
+      border-radius: 10px;
+      background: #0d1320;
+      color: white;
+      margin-bottom: 15px;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      border: 0;
+      border-radius: 10px;
+      background: #ff6b00;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 15px;
+      line-height: 1.9;
+      color: #dce3ef;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🔥 Follower AI</h1>
+    <div class="subtitle">دستیار هوشمند رشد پیج اینستاگرام</div>
+
+    <div class="card">
+      <label>موضوع پیج</label>
+      <input id="niche" placeholder="مثلاً آتش نشانی و بدنسازی">
+
+      <label>تعداد فالوور فعلی</label>
+      <input id="followers" type="number" placeholder="مثلاً 2500">
+
+      <label>هدف اصلی</label>
+      <select id="goal">
+        <option>افزایش فالوور هدفمند</option>
+        <option>افزایش تعامل</option>
+        <option>افزایش بازدید ریلز</option>
+      </select>
+
+      <button onclick="generatePlan()">ساخت برنامه رشد 🚀</button>
+
+      <div id="result"></div>
+    </div>
+  </div>
+
+  <script>
+    function generatePlan() {
+      const niche = document.getElementById("niche").value || "حوزه فعالیت شما";
+      const followers = document.getElementById("followers").value || "نامشخص";
+
+      document.getElementById("result").innerHTML = `
+        <strong>برنامه اولیه رشد برای ${niche}</strong><br><br>
+        فالوور فعلی: ${followers}<br><br>
+        🔹 روزانه یک ریلز با Hook قوی منتشر کن.<br>
+        🔹 روی محتوای آموزشی و چالشی تمرکز کن.<br>
+        🔹 در پایان هر ریلز یک CTA واضح برای فالو داشته باش.<br>
+        🔹 به کامنت‌های مخاطبان مرتبط پاسخ بده.<br>
+        🔹 عملکرد ریلزها را هر ۷ روز بررسی و محتوای موفق را تکرار کن.
+      `;
+    }
+  </script>
+</body>
+</html>
