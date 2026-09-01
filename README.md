@@ -178,15 +178,25 @@ advice="تعامل بسیار خوب است؛ همین فرمت را با موض
 }
 
 document.getElementById("analysis").innerHTML=`
-<div class="stat"><strong>${engagement}%</strong><br><span class="small">نرخ تعامل</span></div>
-<div class="stat"><strong>${conversion}%</strong><br><span class="small">تبدیل بازدید به فالو</span></div>
+<div class="stat">
+<strong>${engagement}%</strong><br>
+<span class="small">نرخ تعامل</span>
+</div>
+
+<div class="stat">
+<strong>${conversion}%</strong><br>
+<span class="small">تبدیل بازدید به فالو</span>
+</div>
+
 <br><br>
-📌 ${advice}<br><br>
+
+📌 ${advice}
+
+<br><br>
+
 🚀 پیشنهاد: در پایان ریلز یک دلیل مشخص برای فالو کردن بده و بهترین موضوعات را دوباره با اجرای متفاوت تولید کن.
 `;
 }
-</script>
 
-</div>
-</body>
-</html>
+
+
