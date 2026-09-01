@@ -1,107 +1,527 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Follower AI</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b0f19;
-      color: #fff;
-    }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      padding: 25px 18px;
-    }
-    h1 { text-align: center; margin-bottom: 8px; }
-    .subtitle {
-      text-align: center;
-      color: #aab2c5;
-      margin-bottom: 25px;
-    }
-    .card {
-      background: #151b29;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #cbd3e1;
-    }
-    input, select {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid #30394d;
-      border-radius: 10px;
-      background: #0d1320;
-      color: white;
-      margin-bottom: 15px;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      border: 0;
-      border-radius: 10px;
-      background: #ff6b00;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    #result {
-      margin-top: 15px;
-      line-height: 1.9;
-      color: #dce3ef;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Follower AI</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;
+background:#070b12;
+color:#fff;
+font-family:Arial,sans-serif;
+}
+.app{
+max-width:700px;
+margin:auto;
+padding:16px;
+}
+header{
+text-align:center;
+padding:20px 0;
+}
+.logo{font-size:48px}
+h1{margin:5px 0;font-size:30px}
+.sub{color:#9ba6ba}
+.card{
+background:#111827;
+border:1px solid #273349;
+border-radius:18px;
+padding:18px;
+margin:14px 0;
+}
+h2{
+margin:0 0 16px;
+font-size:19px;
+}
+label{
+display:block;
+margin:12px 0 7px;
+color:#cbd5e1;
+}
+input,select{
+width:100%;
+padding:13px;
+border-radius:10px;
+border:1px solid #334155;
+background:#0b1220;
+color:#fff;
+font-size:15px;
+}
+button{
+width:100%;
+padding:14px;
+margin-top:16px;
+border:0;
+border-radius:11px;
+background:#ff6900;
+color:#fff;
+font-size:16px;
+font-weight:bold;
+}
+.result{
+margin-top:16px;
+line-height:2;
+color:#e2e8f0;
+}
+.item{
+background:#0b1220;
+border-radius:12px;
+padding:13px;
+margin:9px 0;
+}
+.stat{
+display:inline-block;
+width:48%;
+margin:1%;
+padding:14px;
+background:#0b1220;
+border-radius:12px;
+text-align:center;
+}
+.small{
+color:#94a3b8;
+font-size:12px;
+}
+.tag{
+display:inline-block;
+padding:5px 9px;
+margin:3px;
+background:#1e293b;
+border-radius:8px;
+font-size:13px;
+}
+.good{border-right:4px solid #22c55e}
+.warn{border-right:4px solid #f59e0b}
+.bad{border-right:4px solid #ef4444}
+</style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>🔥 Follower AI</h1>
-    <div class="subtitle">دستیار هوشمند رشد پیج اینستاگرام</div>
 
-    <div class="card">
-      <label>موضوع پیج</label>
-      <input id="niche" placeholder="مثلاً آتش نشانی و بدنسازی">
+<div class="app">
 
-      <label>تعداد فالوور فعلی</label>
-      <input id="followers" type="number" placeholder="مثلاً 2500">
+<header>
+<div class="logo">🔥</div>
+<h1>Follower AI</h1>
+<div class="sub">دستیار هوشمند رشد پیج اینستاگرام</div>
+</header>
 
-      <label>هدف اصلی</label>
-      <select id="goal">
-        <option>افزایش فالوور هدفمند</option>
-        <option>افزایش تعامل</option>
-        <option>افزایش بازدید ریلز</option>
-      </select>
 
-      <button onclick="generatePlan()">ساخت برنامه رشد 🚀</button>
+<div class="card">
 
-      <div id="result"></div>
-    </div>
-  </div>
+<h2>🎯 تحلیل پیج</h2>
 
-  <script>
-    function generatePlan() {
-      const niche = document.getElementById("niche").value || "حوزه فعالیت شما";
-      const followers = document.getElementById("followers").value || "نامشخص";
+<label>موضوع پیج</label>
+<input id="niche" placeholder="مثلاً آتش نشانی + بدنسازی">
 
-      document.getElementById("result").innerHTML = `
-        <strong>برنامه اولیه رشد برای ${niche}</strong><br><br>
-        فالوور فعلی: ${followers}<br><br>
-        🔹 روزانه یک ریلز با Hook قوی منتشر کن.<br>
-        🔹 روی محتوای آموزشی و چالشی تمرکز کن.<br>
-        🔹 در پایان هر ریلز یک CTA واضح برای فالو داشته باش.<br>
-        🔹 به کامنت‌های مخاطبان مرتبط پاسخ بده.<br>
-        🔹 عملکرد ریلزها را هر ۷ روز بررسی و محتوای موفق را تکرار کن.
-      `;
-    }
-  </script>
+<label>تعداد فالوور</label>
+<input id="followers" type="number" placeholder="مثلاً 2126">
+
+<label>هدف اصلی</label>
+<select id="goal">
+<option>افزایش فالوور هدفمند</option>
+<option>افزایش بازدید ریلز</option>
+<option>افزایش تعامل</option>
+<option>ساخت برند شخصی</option>
+</select>
+
+<button onclick="analyzePage()">🚀 ساخت استراتژی</button>
+
+<div id="pageResult" class="result"></div>
+
+</div>
+
+
+<div class="card">
+
+<h2>🧠 مخاطب هدف</h2>
+
+<div id="audience" class="result">
+بعد از تحلیل پیج نمایش داده می‌شود.
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>🔥 ایده‌های ریلز</h2>
+
+<div id="ideas" class="result">
+بعد از تحلیل پیج نمایش داده می‌شود.
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>📅 برنامه محتوایی ۷ روزه</h2>
+
+<div id="plan" class="result">
+بعد از تحلیل پیج نمایش داده می‌شود.
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>📊 تحلیل ریلز</h2>
+
+<label>بازدید</label>
+<input id="views" type="number" placeholder="3000">
+
+<label>لایک</label>
+<input id="likes" type="number" placeholder="150">
+
+<label>کامنت</label>
+<input id="comments" type="number" placeholder="20">
+
+<label>اشتراک‌گذاری</label>
+<input id="shares" type="number" placeholder="10">
+
+<label>ذخیره</label>
+<input id="saves" type="number" placeholder="15">
+
+<label>فالوور جدید</label>
+<input id="newfollowers" type="number" placeholder="30">
+
+<button onclick="analyzeReel()">🔍 تحلیل ریلز</button>
+
+<div id="reelResult" class="result"></div>
+
+</div>
+
+
+<div class="card">
+
+<h2>💡 پیشنهاد ریلز بعدی</h2>
+
+<div id="nextReel" class="result">
+اطلاعات ریلز را وارد کن تا پیشنهاد بعدی ساخته شود.
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+function analyzePage(){
+
+const niche =
+document.getElementById("niche").value.trim() ||
+"آمادگی جسمانی";
+
+const followers =
+Number(document.getElementById("followers").value) || 0;
+
+const goal =
+document.getElementById("goal").value;
+
+
+document.getElementById("pageResult").innerHTML = `
+
+<div class="item good">
+
+<strong>🎯 استراتژی پیشنهادی</strong>
+
+<br><br>
+
+موضوع پیج: ${niche}
+
+<br>
+
+فالوور فعلی: ${followers.toLocaleString("fa-IR")}
+
+<br>
+
+هدف: ${goal}
+
+<br><br>
+
+<strong>فرمول رشد:</strong>
+
+<br>
+
+Hook قوی → ارزش واقعی → تدوین سریع → CTA → تعامل
+
+<br><br>
+
+تمرکز اصلی باید روی ریلزهای کوتاه،
+قابل فهم و قابل اشتراک‌گذاری باشد.
+
+</div>
+
+`;
+
+
+document.getElementById("audience").innerHTML = `
+
+<strong>مخاطب هدف:</strong>
+
+<br><br>
+
+افرادی که به <strong>${niche}</strong> علاقه دارند.
+
+<br>
+
+افرادی که دنبال آموزش و تجربه واقعی هستند.
+
+<br>
+
+افرادی که به چالش، عملکرد و پیشرفت علاقه دارند.
+
+<br><br>
+
+<span class="tag">${niche}</span>
+<span class="tag">آموزش</span>
+<span class="tag">چالش</span>
+<span class="tag">فیتنس</span>
+<span class="tag">عملکرد</span>
+<span class="tag">انگیزشی</span>
+
+`;
+
+
+const ideas = [
+
+"🔥 «اگر فکر می‌کنی آماده‌ای، این چالش رو امتحان کن!»",
+
+"💪 «۳ اشتباه که باعث میشه عملکردت ضعیف بشه»",
+
+"⚡ «این تمرین رو ۳۰ روز انجام بده و نتیجه رو ببین»",
+
+"🎯 «بدون فیلتر؛ نتیجه واقعی این تمرین»",
+
+"🚨 «آیا برای این شرایط واقعاً آماده‌ای؟»",
+
+"🏆 «سخت‌ترین چالش این هفته؛ تو می‌تونی؟»"
+
+];
+
+
+document.getElementById("ideas").innerHTML =
+
+ideas.map(function(x){
+
+return `<div class="item">${x}</div>`;
+
+}).join("");
+
+
+const days = [
+
+"روز ۱ — 🎬 ریلز آموزشی + پاسخ به تمام کامنت‌ها",
+
+"روز ۲ — 📱 استوری نظرسنجی + سؤال از مخاطب",
+
+"روز ۳ — 🔥 ریلز چالشی + CTA برای فالو",
+
+"روز ۴ — 🎥 پشت صحنه + استوری تعاملی",
+
+"روز ۵ — 💡 ریلز «۳ اشتباه رایج»",
+
+"روز ۶ — 🏆 اجرای دوباره بهترین ایده با Hook جدید",
+
+"روز ۷ — 📊 بررسی آمار و انتخاب موضوع برنده"
+
+];
+
+
+document.getElementById("plan").innerHTML =
+
+days.map(function(x){
+
+return `<div class="item">${x}</div>`;
+
+}).join("");
+
+}
+
+
+function analyzeReel(){
+
+const v =
+Number(document.getElementById("views").value) || 0;
+
+const l =
+Number(document.getElementById("likes").value) || 0;
+
+const c =
+Number(document.getElementById("comments").value) || 0;
+
+const s =
+Number(document.getElementById("shares").value) || 0;
+
+const sa =
+Number(document.getElementById("saves").value) || 0;
+
+const f =
+Number(document.getElementById("newfollowers").value) || 0;
+
+
+if(v <= 0){
+
+document.getElementById("reelResult").innerHTML =
+
+`<div class="item bad">
+⚠️ تعداد بازدید را وارد کن.
+</div>`;
+
+return;
+
+}
+
+
+const engagement =
+((l+c+s+sa)/v*100);
+
+const conversion =
+(f/v*100);
+
+
+let engagementText;
+let engagementClass;
+
+if(engagement < 3){
+
+engagementText =
+"تعامل پایین است. Hook و شروع ریلز باید قوی‌تر شود.";
+
+engagementClass="bad";
+
+}
+
+else if(engagement < 7){
+
+engagementText =
+"تعامل متوسط است. روی Share و Save بیشتر تمرکز کن.";
+
+engagementClass="warn";
+
+}
+
+else{
+
+engagementText =
+"تعامل عالی است. این سبک محتوا ارزش تکرار دارد.";
+
+engagementClass="good";
+
+}
+
+
+let conversionText;
+
+if(conversion < 0.5){
+
+conversionText =
+"تبدیل بازدید به فالو پایین است؛ CTA واضح‌تری اضافه کن.";
+
+}
+
+else if(conversion < 1){
+
+conversionText =
+"تبدیل متوسط است؛ دلیل قوی‌تری برای فالو کردن بده.";
+
+}
+
+else{
+
+conversionText =
+"تبدیل بازدید به فالو خوب است.";
+
+}
+
+
+document.getElementById("reelResult").innerHTML = `
+
+<div class="stat">
+
+<strong>${engagement.toFixed(2)}%</strong>
+
+<br>
+
+<span class="small">نرخ تعامل</span>
+
+</div>
+
+
+<div class="stat">
+
+<strong>${conversion.toFixed(2)}%</strong>
+
+<br>
+
+<span class="small">تبدیل به فالو</span>
+
+</div>
+
+
+<div class="item ${engagementClass}">
+
+📌 ${engagementText}
+
+</div>
+
+
+<div class="item">
+
+🎯 ${conversionText}
+
+</div>
+
+`;
+
+
+document.getElementById("nextReel").innerHTML = `
+
+<div class="item">
+
+<strong>🔥 ریلز پیشنهادی بعدی</strong>
+
+<br><br>
+
+یک ریلز کوتاه با این ساختار بساز:
+
+<br><br>
+
+<strong>ثانیه ۰ تا ۳:</strong>
+
+یک Hook بسیار قوی.
+
+<br>
+
+<strong>ثانیه ۳ تا ۱۰:</strong>
+
+نمایش نتیجه یا چالش.
+
+<br>
+
+<strong>ثانیه ۱۰ تا ۲۰:</strong>
+
+آموزش یا نکته اصلی.
+
+<br>
+
+<strong>پایان:</strong>
+
+«اگر قسمت بعدی رو می‌خوای، پیج رو فالو کن.»
+
+</div>
+
+`;
+
+}
+
+</script>
+
 </body>
 </html>
