@@ -198,5 +198,3 @@ document.getElementById("analysis").innerHTML=`
 `;
 }
 
-
-
