@@ -11,7 +11,7 @@ export default {
       "Vary": "Origin"
     };
 
-    // CORS
+    // CORS PRE-FLIGHT
     if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
@@ -19,7 +19,7 @@ export default {
       });
     }
 
-    // تست آنلاین بودن Worker
+    // GET - TEST
     if (request.method === "GET") {
       return new Response(
         JSON.stringify({
@@ -36,7 +36,7 @@ export default {
       );
     }
 
-    // فقط POST
+    // ONLY POST IS ALLOWED AFTER THIS
     if (request.method !== "POST") {
       return new Response(
         JSON.stringify({
@@ -78,6 +78,7 @@ export default {
         );
       }
 
+      // CLOUDFLARE WORKERS AI
       const result = await env.AI.run(
         "@cf/zai-org/glm-4.7-flash",
         {
@@ -85,7 +86,7 @@ export default {
             {
               role: "system",
               content:
-                "تو Follower AI هستی؛ یک استراتژیست حرفه‌ای رشد ارگانیک اینستاگرام. همیشه فارسی، دقیق، کاربردی و حرفه‌ای پاسخ بده. روی فالوور هدفمند، ایده ریلز، Hook، CTA، Retention، تعامل، Share، Save و برند شخصی تمرکز کن. هرگز اسپم، فالو/آنفالو خودکار یا دایرکت انبوه پیشنهاد نده."
+                "تو Follower AI هستی؛ یک استراتژیست حرفه‌ای رشد ارگانیک اینستاگرام. همیشه فارسی، دقیق، کاربردی و حرفه‌ای پاسخ بده. روی فالوور هدفمند، ایده ریلز، Hook، CTA، کپشن، Retention، تعامل، Share، Save و برند شخصی تمرکز کن. هرگز اسپم، فالو/آنفالو خودکار یا دایرکت انبوه پیشنهاد نده."
             },
             {
               role: "user",
