@@ -1,17 +1,14 @@
 export default {
   async fetch(request, env) {
 
-    const origin = request.headers.get("Origin") || "*";
-
     const corsHeaders = {
-      "Access-Control-Allow-Origin": origin,
+      "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Access-Control-Max-Age": "86400",
-      "Vary": "Origin"
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Max-Age": "86400"
     };
 
-    // CORS PRE-FLIGHT
+    // CORS PREFLIGHT
     if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
@@ -19,7 +16,7 @@ export default {
       });
     }
 
-    // GET - TEST
+    // HEALTH CHECK
     if (request.method === "GET") {
       return new Response(
         JSON.stringify({
@@ -36,7 +33,7 @@ export default {
       );
     }
 
-    // ONLY POST IS ALLOWED AFTER THIS
+    // ONLY POST
     if (request.method !== "POST") {
       return new Response(
         JSON.stringify({
@@ -78,7 +75,7 @@ export default {
         );
       }
 
-      // CLOUDFLARE WORKERS AI
+      // CALL CLOUDFLARE AI
       const result = await env.AI.run(
         "@cf/zai-org/glm-4.7-flash",
         {
@@ -86,7 +83,7 @@ export default {
             {
               role: "system",
               content:
-                "تو Follower AI هستی؛ یک استراتژیست حرفه‌ای رشد ارگانیک اینستاگرام. همیشه فارسی، دقیق، کاربردی و حرفه‌ای پاسخ بده. روی فالوور هدفمند، ایده ریلز، Hook، CTA، کپشن، Retention، تعامل، Share، Save و برند شخصی تمرکز کن. هرگز اسپم، فالو/آنفالو خودکار یا دایرکت انبوه پیشنهاد نده."
+                "تو Follower AI هستی؛ یک استراتژیست حرفه‌ای رشد ارگانیک اینستاگرام. همیشه فارسی، دقیق، کاربردی و حرفه‌ای پاسخ بده. روی فالوور هدفمند، ایده ریلز، Hook، CTA، Retention، تعامل، Share، Save و برند شخصی تمرکز کن. هرگز اسپم، فالو/آنفالو خودکار یا دایرکت انبوه پیشنهاد نده."
             },
             {
               role: "user",
@@ -96,10 +93,75 @@ export default {
         }
       );
 
+      // استخراج مطمئن متن AI
+      let aiText = "";
+
+      if (typeof result === "string") {
+        aiText = result;
+      }
+
+      else if (result && typeof result.response === "string") {
+        aiText = result.response;
+      }
+
+      else if (result && typeof result.output_text === "string") {
+        aiText = result.output_text;
+      }
+
+      else if (result && typeof result.text === "string") {
+        aiText = result.text;
+      }
+
+      else if (
+        result &&
+        result.response &&
+        typeof result.response === "object"
+      ) {
+
+        if (typeof result.response.response === "string") {
+          aiText = result.response.response;
+        }
+
+        else if (typeof result.response.output_text === "string") {
+          aiText = result.response.output_text;
+        }
+
+        else if (typeof result.response.text === "string") {
+          aiText = result.response.text;
+        }
+      }
+
+      // اگر ساختار متفاوت بود، کل خروجی را به متن تبدیل کن
+      if (!aiText && result) {
+        try {
+          aiText = JSON.stringify(result);
+        } catch (e) {
+          aiText = "";
+        }
+      }
+
+      // اگر واقعاً خروجی خالی بود
+      if (!aiText || !aiText.trim()) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "Cloudflare AI returned an empty response"
+          }),
+          {
+            status: 502,
+            headers: {
+              "Content-Type": "application/json; charset=UTF-8",
+              ...corsHeaders
+            }
+          }
+        );
+      }
+
+      // SUCCESS
       return new Response(
         JSON.stringify({
           success: true,
-          response: result
+          response: aiText
         }),
         {
           status: 200,
@@ -128,7 +190,6 @@ export default {
           }
         }
       );
-
     }
   }
 };
