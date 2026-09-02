@@ -1,7 +1,8 @@
 export default {
   async fetch(request, env) {
     const cors = {
-      "Access-Control-Allow-Origin": "https://mehrdadaghapour47-cmd.github.io",
+      "Access-Control-Allow-Origin":
+        "https://mehrdadaghapour47-cmd.github.io",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type"
     };
@@ -26,15 +27,23 @@ export default {
     }
 
     if (request.method !== "POST") {
-      return new Response("Method Not Allowed", {
-        status: 405,
-        headers: cors
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Method Not Allowed"
+        }),
+        {
+          status: 405,
+          headers: {
+            "Content-Type": "application/json",
+            ...cors
+          }
+        }
+      );
     }
 
     try {
       const body = await request.json();
-
       const prompt = body.prompt || "";
 
       if (!prompt) {
@@ -60,4 +69,42 @@ export default {
             {
               role: "system",
               content:
-                "تو Follower AI هستی؛ یک استراتژیست حرفه‌ای رشد ارگانیک اینستاگرام. همیشه فارسی، دقیق و کاربردی پاسخ بده. روی فالوور هدفمند، ایده ریلز، Hook، CTA، کپشن، تعامل، برند شخصی و تحلیل ریلز تمرکز کن. هرگز اسپم، فالو/آنفالو خودکار یا دایرکت انبوه پیشنهاد نده
+                "تو Follower AI هستی؛ یک استراتژیست حرفه‌ای رشد ارگانیک اینستاگرام. همیشه فارسی، دقیق و کاربردی پاسخ بده. روی فالوور هدفمند، ایده ریلز، Hook، CTA، کپشن، تعامل، برند شخصی و تحلیل ریلز تمرکز کن. هرگز اسپم، فالو/آنفالو خودکار یا دایرکت انبوه پیشنهاد نده."
+            },
+            {
+              role: "user",
+              content: prompt
+            }
+          ]
+        }
+      );
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          response: result
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...cors
+          }
+        }
+      );
+    } catch (error) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: error.message || "AI request failed"
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            ...cors
+          }
+        }
+      );
+    }
+  }
+};
