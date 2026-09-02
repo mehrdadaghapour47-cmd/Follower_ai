@@ -1,56 +1,62 @@
+const ALLOWED_ORIGIN = "https://mehrdadaghapour47-cmd.github.io";
+
+function corsHeaders() {
+  return {
+    "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Max-Age": "86400",
+    "Vary": "Origin"
+  };
+}
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=UTF-8",
+      ...corsHeaders()
+    }
+  });
+}
+
 export default {
   async fetch(request, env) {
-
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "*",
-      "Access-Control-Max-Age": "86400"
-    };
 
     // CORS PREFLIGHT
     if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
-        headers: corsHeaders
+        headers: corsHeaders()
       });
     }
 
     // HEALTH CHECK
     if (request.method === "GET") {
-      return new Response(
-        JSON.stringify({
-          success: true,
-          message: "🔥 Follower AI is online"
-        }),
-        {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-            ...corsHeaders
-          }
-        }
-      );
+      return json({
+        success: true,
+        message: "🔥 Follower AI is online",
+        ai: !!env.AI
+      });
     }
 
     // ONLY POST
     if (request.method !== "POST") {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: "Method Not Allowed"
-        }),
-        {
-          status: 405,
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-            ...corsHeaders
-          }
-        }
-      );
+      return json({
+        success: false,
+        error: "Method Not Allowed"
+      }, 405);
     }
 
     try {
+
+      // Check AI binding
+      if (!env.AI) {
+        return json({
+          success: false,
+          error: "Workers AI binding is missing"
+        }, 500);
+      }
 
       const body = await request.json();
 
@@ -60,22 +66,12 @@ export default {
           : "";
 
       if (!prompt) {
-        return new Response(
-          JSON.stringify({
-            success: false,
-            error: "Prompt is required"
-          }),
-          {
-            status: 400,
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-              ...corsHeaders
-            }
-          }
-        );
+        return json({
+          success: false,
+          error: "Prompt is required"
+        }, 400);
       }
 
-      // CALL CLOUDFLARE AI
       const result = await env.AI.run(
         "@cf/zai-org/glm-4.7-flash",
         {
@@ -93,103 +89,42 @@ export default {
         }
       );
 
-      // استخراج مطمئن متن AI
       let aiText = "";
 
       if (typeof result === "string") {
         aiText = result;
-      }
-
-      else if (result && typeof result.response === "string") {
+      } else if (result && typeof result.response === "string") {
         aiText = result.response;
-      }
-
-      else if (result && typeof result.output_text === "string") {
+      } else if (result && typeof result.output_text === "string") {
         aiText = result.output_text;
-      }
-
-      else if (result && typeof result.text === "string") {
+      } else if (result && typeof result.text === "string") {
         aiText = result.text;
       }
 
-      else if (
-        result &&
-        result.response &&
-        typeof result.response === "object"
-      ) {
-
-        if (typeof result.response.response === "string") {
-          aiText = result.response.response;
-        }
-
-        else if (typeof result.response.output_text === "string") {
-          aiText = result.response.output_text;
-        }
-
-        else if (typeof result.response.text === "string") {
-          aiText = result.response.text;
-        }
-      }
-
-      // اگر ساختار متفاوت بود، کل خروجی را به متن تبدیل کن
       if (!aiText && result) {
-        try {
-          aiText = JSON.stringify(result);
-        } catch (e) {
-          aiText = "";
-        }
+        aiText = JSON.stringify(result);
       }
 
-      // اگر واقعاً خروجی خالی بود
       if (!aiText || !aiText.trim()) {
-        return new Response(
-          JSON.stringify({
-            success: false,
-            error: "Cloudflare AI returned an empty response"
-          }),
-          {
-            status: 502,
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-              ...corsHeaders
-            }
-          }
-        );
+        return json({
+          success: false,
+          error: "Cloudflare AI returned an empty response"
+        }, 502);
       }
 
-      // SUCCESS
-      return new Response(
-        JSON.stringify({
-          success: true,
-          response: aiText
-        }),
-        {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-            ...corsHeaders
-          }
-        }
-      );
+      return json({
+        success: true,
+        response: aiText
+      });
 
     } catch (error) {
 
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error:
-            error && error.message
-              ? error.message
-              : "AI request failed"
-        }),
-        {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-            ...corsHeaders
-          }
-        }
-      );
+      console.error("Follower AI ERROR:", error);
+
+      return json({
+        success: false,
+        error: error?.message || "AI request failed"
+      }, 500);
     }
   }
 };
