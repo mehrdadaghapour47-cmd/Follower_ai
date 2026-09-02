@@ -653,6 +653,7 @@ button,
 loadingText
 );
 
+
 setStatus(
 "⏳ در حال ارتباط با هوش مصنوعی Follower AI...",
 "loading"
@@ -661,23 +662,23 @@ setStatus(
 
 try{
 
+/*
+  مهم:
+  Worker فعلی GET است.
+  بنابراین دیگر POST و JSON body نداریم.
+*/
+
+const url =
+API_URL +
+"?prompt=" +
+encodeURIComponent(prompt);
+
+
 const response =
-await fetch(
-API_URL,
-{
-method:"POST",
-
-headers:{
-"Content-Type":
-"application/json"
-},
-
-body:JSON.stringify({
-prompt:prompt
-})
-
-}
-);
+await fetch(url, {
+method:"GET",
+cache:"no-store"
+});
 
 
 const rawText =
@@ -685,6 +686,7 @@ await response.text();
 
 
 let data;
+
 
 try{
 
@@ -799,7 +801,6 @@ showResult(
 "\n\nآدرس Worker:\n" +
 API_URL
 );
-
 
 }finally{
 
