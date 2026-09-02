@@ -3,99 +3,166 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#070b12">
+
 <title>Follower AI</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
 body{
-margin:0;
-background:#070b12;
-color:#fff;
-font-family:Arial,sans-serif;
+  margin:0;
+  background:#070b12;
+  color:#fff;
+  font-family:Arial,sans-serif;
 }
+
 .app{
-max-width:700px;
-margin:auto;
-padding:1px;
+  max-width:700px;
+  margin:auto;
+  padding:14px;
 }
+
 header{
-text-align:center;
-padding:20px 0;
+  text-align:center;
+  padding:25px 0 20px;
 }
-.logo{font-size:48px}
-h1{margin:5px 0;font-size:30px}
-.sub{color:#9ba6ba}
+
+.logo{
+  font-size:52px;
+}
+
+h1{
+  margin:6px 0;
+  font-size:31px;
+}
+
+.sub{
+  color:#9ba6ba;
+  font-size:14px;
+}
+
 .card{
-background:#111827;
-border:1px solid #273349;
-border-radius:18px;
-padding:18px;
-margin:14px 0;
+  background:#111827;
+  border:1px solid #273349;
+  border-radius:18px;
+  padding:18px;
+  margin:14px 0;
 }
+
 h2{
-margin:0 0 16px;
-font-size:19px;
+  margin:0 0 16px;
+  font-size:19px;
 }
+
 label{
-display:block;
-margin:12px 0 7px;
-color:#cbd5e1;
+  display:block;
+  margin:12px 0 7px;
+  color:#cbd5e1;
 }
-input,select{
-width:100%;
-padding:13px;
-border-radius:10px;
-border:1px solid #334155;
-background:#0b1220;
-color:#fff;
-font-size:15px;
+
+input,
+select{
+  width:100%;
+  padding:13px;
+  border-radius:10px;
+  border:1px solid #334155;
+  background:#0b1220;
+  color:#fff;
+  font-size:15px;
+  outline:none;
 }
+
+input:focus,
+select:focus{
+  border-color:#ff6900;
+}
+
 button{
-width:100%;
-padding:14px;
-margin-top:16px;
-border:0;
-border-radius:11px;
-background:#ff6900;
-color:#fff;
-font-size:16px;
-font-weight:bold;
+  width:100%;
+  padding:14px;
+  margin-top:16px;
+  border:0;
+  border-radius:11px;
+  background:#ff6900;
+  color:#fff;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
 }
+
+button:disabled{
+  opacity:.6;
+  cursor:wait;
+}
+
 .result{
-margin-top:16px;
-line-height:2;
-color:#e2e8f0;
+  margin-top:16px;
+  line-height:2;
+  color:#e2e8f0;
 }
+
 .item{
-background:#0b1220;
-border-radius:12px;
-padding:13px;
-margin:9px 0;
+  background:#0b1220;
+  border-radius:12px;
+  padding:14px;
+  margin:9px 0;
+  overflow-wrap:anywhere;
 }
+
 .stat{
-display:inline-block;
-width:48%;
-margin:1%;
-padding:14px;
-background:#0b1220;
-border-radius:12px;
-text-align:center;
+  display:inline-block;
+  width:48%;
+  margin:1%;
+  padding:14px;
+  background:#0b1220;
+  border-radius:12px;
+  text-align:center;
 }
+
 .small{
-color:#94a3b8;
-font-size:12px;
+  color:#94a3b8;
+  font-size:12px;
 }
+
 .tag{
-display:inline-block;
-padding:5px 9px;
-margin:3px;
-background:#1e293b;
-border-radius:8px;
-font-size:13px;
+  display:inline-block;
+  padding:5px 9px;
+  margin:3px;
+  background:#1e293b;
+  border-radius:8px;
+  font-size:13px;
 }
-.good{border-right:4px solid #22c55e}
-.warn{border-right:4px solid #f59e0b}
-.bad{border-right:4px solid #ef4444}
+
+.good{
+  border-right:4px solid #22c55e;
+}
+
+.warn{
+  border-right:4px solid #f59e0b;
+}
+
+.bad{
+  border-right:4px solid #ef4444;
+}
+
+.loading{
+  text-align:center;
+  padding:20px;
+}
+
+footer{
+  text-align:center;
+  color:#64748b;
+  font-size:12px;
+  padding:20px 0;
+}
 </style>
 </head>
 
@@ -104,420 +171,933 @@ font-size:13px;
 <div class="app">
 
 <header>
-<div class="logo">🔥</div>
-<h1>Follower AI</h1>
-<div class="sub">دستیار هوشمند رشد پیج اینستاگرام</div>
+  <div class="logo">🔥</div>
+  <h1>Follower AI</h1>
+  <div class="sub">
+    دستیار هوشمند رشد پیج اینستاگرام
+  </div>
 </header>
 
+
+<!-- =========================
+     PAGE ANALYSIS
+========================= -->
 
 <div class="card">
 
 <h2>🎯 تحلیل پیج</h2>
 
-<label>موضوع پیج</label>
-<input id="niche" placeholder="مثلاً آتش نشانی + بدنسازی">
+<label for="niche">موضوع پیج</label>
 
-<label>تعداد فالوور</label>
-<input id="followers" type="number" placeholder="مثلاً 2126">
+<input
+  id="niche"
+  type="text"
+  placeholder="مثلاً آتش نشانی + بدنسازی"
+>
 
-<label>هدف اصلی</label>
+<label for="followers">تعداد فالوور</label>
+
+<input
+  id="followers"
+  type="number"
+  min="0"
+  placeholder="مثلاً 2126"
+>
+
+<label for="goal">هدف اصلی</label>
+
 <select id="goal">
-<option>افزایش فالوور هدفمند</option>
-<option>افزایش بازدید ریلز</option>
-<option>افزایش تعامل</option>
-<option>ساخت برند شخصی</option>
+
+  <option>افزایش فالوور هدفمند</option>
+
+  <option>افزایش بازدید ریلز</option>
+
+  <option>افزایش تعامل</option>
+
+  <option>ساخت برند شخصی</option>
+
 </select>
 
-<button onclick="analyzePage()">🚀 ساخت استراتژی</button>
+<button
+  id="analyzePageButton"
+  onclick="analyzePage()"
+>
+🚀 ساخت استراتژی با هوش مصنوعی
+</button>
 
 <div id="pageResult" class="result"></div>
 
 </div>
 
 
+<!-- =========================
+     AUDIENCE
+========================= -->
+
 <div class="card">
 
 <h2>🧠 مخاطب هدف</h2>
 
 <div id="audience" class="result">
+
 بعد از تحلیل پیج نمایش داده می‌شود.
-</div>
 
 </div>
 
+</div>
+
+
+<!-- =========================
+     REELS IDEAS
+========================= -->
 
 <div class="card">
 
 <h2>🔥 ایده‌های ریلز</h2>
 
 <div id="ideas" class="result">
+
 بعد از تحلیل پیج نمایش داده می‌شود.
-</div>
 
 </div>
 
+</div>
+
+
+<!-- =========================
+     CONTENT PLAN
+========================= -->
 
 <div class="card">
 
 <h2>📅 برنامه محتوایی ۷ روزه</h2>
 
 <div id="plan" class="result">
+
 بعد از تحلیل پیج نمایش داده می‌شود.
-</div>
 
 </div>
 
+</div>
+
+
+<!-- =========================
+     REEL ANALYSIS
+========================= -->
 
 <div class="card">
 
 <h2>📊 تحلیل ریلز</h2>
 
-<label>بازدید</label>
-<input id="views" type="number" placeholder="3000">
+<label for="views">بازدید</label>
 
-<label>لایک</label>
-<input id="likes" type="number" placeholder="150">
+<input
+  id="views"
+  type="number"
+  min="0"
+  placeholder="3000"
+>
 
-<label>کامنت</label>
-<input id="comments" type="number" placeholder="20">
+<label for="likes">لایک</label>
 
-<label>اشتراک‌گذاری</label>
-<input id="shares" type="number" placeholder="10">
+<input
+  id="likes"
+  type="number"
+  min="0"
+  placeholder="150"
+>
 
-<label>ذخیره</label>
-<input id="saves" type="number" placeholder="15">
+<label for="comments">کامنت</label>
 
-<label>فالوور جدید</label>
-<input id="newfollowers" type="number" placeholder="30">
+<input
+  id="comments"
+  type="number"
+  min="0"
+  placeholder="20"
+>
 
-<button onclick="analyzeReel()">🔍 تحلیل ریلز</button>
+<label for="shares">اشتراک‌گذاری</label>
+
+<input
+  id="shares"
+  type="number"
+  min="0"
+  placeholder="10"
+>
+
+<label for="saves">ذخیره</label>
+
+<input
+  id="saves"
+  type="number"
+  min="0"
+  placeholder="15"
+>
+
+<label for="newfollowers">فالوور جدید</label>
+
+<input
+  id="newfollowers"
+  type="number"
+  min="0"
+  placeholder="30"
+>
+
+<button onclick="analyzeReel()">
+🔍 تحلیل ریلز
+</button>
 
 <div id="reelResult" class="result"></div>
 
 </div>
 
 
+<!-- =========================
+     NEXT REEL
+========================= -->
+
 <div class="card">
 
 <h2>💡 پیشنهاد ریلز بعدی</h2>
 
 <div id="nextReel" class="result">
+
 اطلاعات ریلز را وارد کن تا پیشنهاد بعدی ساخته شود.
+
 </div>
 
 </div>
+
+
+<footer>
+🔥 Follower AI — رشد هوشمند و ارگانیک اینستاگرام
+</footer>
 
 </div>
 
 
 <script>
 
-function analyzePage(){
+/* ==========================================
+   Follower AI Worker
+========================================== */
 
-const niche =
-document.getElementById("niche").value.trim() ||
-"آمادگی جسمانی";
-
-const followers =
-Number(document.getElementById("followers").value) || 0;
-
-const goal =
-document.getElementById("goal").value;
+const API_URL =
+"https://fallowerai.mehrdadaghapour47.workers.dev";
 
 
-document.getElementById("pageResult").innerHTML = `
+/* ==========================================
+   HTML SAFE TEXT
+========================================== */
 
-<div class="item good">
+function escapeHtml(text){
 
-<strong>🎯 استراتژی پیشنهادی</strong>
-
-<br><br>
-
-موضوع پیج: ${niche}
-
-<br>
-
-فالوور فعلی: ${followers.toLocaleString("fa-IR")}
-
-<br>
-
-هدف: ${goal}
-
-<br><br>
-
-<strong>فرمول رشد:</strong>
-
-<br>
-
-Hook قوی → ارزش واقعی → تدوین سریع → CTA → تعامل
-
-<br><br>
-
-تمرکز اصلی باید روی ریلزهای کوتاه،
-قابل فهم و قابل اشتراک‌گذاری باشد.
-
-</div>
-
-`;
-
-
-document.getElementById("audience").innerHTML = `
-
-<strong>مخاطب هدف:</strong>
-
-<br><br>
-
-افرادی که به <strong>${niche}</strong> علاقه دارند.
-
-<br>
-
-افرادی که دنبال آموزش و تجربه واقعی هستند.
-
-<br>
-
-افرادی که به چالش، عملکرد و پیشرفت علاقه دارند.
-
-<br><br>
-
-<span class="tag">${niche}</span>
-<span class="tag">آموزش</span>
-<span class="tag">چالش</span>
-<span class="tag">فیتنس</span>
-<span class="tag">عملکرد</span>
-<span class="tag">انگیزشی</span>
-
-`;
-
-
-const ideas = [
-
-"🔥 «اگر فکر می‌کنی آماده‌ای، این چالش رو امتحان کن!»",
-
-"💪 «۳ اشتباه که باعث میشه عملکردت ضعیف بشه»",
-
-"⚡ «این تمرین رو ۳۰ روز انجام بده و نتیجه رو ببین»",
-
-"🎯 «بدون فیلتر؛ نتیجه واقعی این تمرین»",
-
-"🚨 «آیا برای این شرایط واقعاً آماده‌ای؟»",
-
-"🏆 «سخت‌ترین چالش این هفته؛ تو می‌تونی؟»"
-
-];
-
-
-document.getElementById("ideas").innerHTML =
-
-ideas.map(function(x){
-
-return `<div class="item">${x}</div>`;
-
-}).join("");
-
-
-const days = [
-
-"روز ۱ — 🎬 ریلز آموزشی + پاسخ به تمام کامنت‌ها",
-
-"روز ۲ — 📱 استوری نظرسنجی + سؤال از مخاطب",
-
-"روز ۳ — 🔥 ریلز چالشی + CTA برای فالو",
-
-"روز ۴ — 🎥 پشت صحنه + استوری تعاملی",
-
-"روز ۵ — 💡 ریلز «۳ اشتباه رایج»",
-
-"روز ۶ — 🏆 اجرای دوباره بهترین ایده با Hook جدید",
-
-"روز ۷ — 📊 بررسی آمار و انتخاب موضوع برنده"
-
-];
-
-
-document.getElementById("plan").innerHTML =
-
-days.map(function(x){
-
-return `<div class="item">${x}</div>`;
-
-}).join("");
+  return String(text)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 
 }
 
+
+/* ==========================================
+   FORMAT AI RESPONSE
+========================================== */
+
+function formatAIText(text){
+
+  let safe = escapeHtml(text);
+
+  safe = safe.replace(
+    /\*\*(.*?)\*\*/g,
+    "<strong>$1</strong>"
+  );
+
+  safe = safe.replace(
+    /^### (.*)$/gm,
+    "<strong>$1</strong>"
+  );
+
+  safe = safe.replace(
+    /^## (.*)$/gm,
+    "<strong>$1</strong>"
+  );
+
+  safe = safe.replace(
+    /^# (.*)$/gm,
+    "<strong>$1</strong>"
+  );
+
+  safe = safe.replace(
+    /\n/g,
+    "<br>"
+  );
+
+  return safe;
+
+}
+
+
+/* ==========================================
+   EXTRACT AI TEXT
+========================================== */
+
+function extractAIText(data){
+
+  if(!data){
+    return "";
+  }
+
+  if(typeof data.response === "string"){
+    return data.response;
+  }
+
+  if(typeof data.output_text === "string"){
+    return data.output_text;
+  }
+
+  if(typeof data.text === "string"){
+    return data.text;
+  }
+
+  if(typeof data.result === "string"){
+    return data.result;
+  }
+
+  if(
+    data.response &&
+    typeof data.response === "object"
+  ){
+
+    if(typeof data.response.response === "string"){
+      return data.response.response;
+    }
+
+    if(typeof data.response.output_text === "string"){
+      return data.response.output_text;
+    }
+
+    if(typeof data.response.text === "string"){
+      return data.response.text;
+    }
+
+  }
+
+  return JSON.stringify(data);
+
+}
+
+
+/* ==========================================
+   PAGE ANALYSIS
+========================================== */
+
+async function analyzePage(){
+
+  const niche =
+    document
+      .getElementById("niche")
+      .value
+      .trim() ||
+    "آمادگی جسمانی";
+
+
+  const followers =
+    Number(
+      document.getElementById("followers").value
+    ) || 0;
+
+
+  const goal =
+    document.getElementById("goal").value;
+
+
+  const resultBox =
+    document.getElementById("pageResult");
+
+
+  const button =
+    document.getElementById("analyzePageButton");
+
+
+  button.disabled = true;
+
+  button.innerText =
+    "⏳ در حال تحلیل...";
+
+
+  resultBox.innerHTML = `
+
+    <div class="item loading">
+
+      ⏳ در حال اتصال به Follower AI...
+
+      <br><br>
+
+      🤖 هوش مصنوعی در حال ساخت
+      استراتژی اختصاصی شماست.
+
+    </div>
+
+  `;
+
+
+  const prompt = `
+
+تو Follower AI هستی؛
+یک استراتژیست حرفه‌ای رشد ارگانیک اینستاگرام.
+
+برای پیج زیر یک استراتژی اختصاصی، دقیق و قابل اجرا طراحی کن.
+
+موضوع پیج:
+${niche}
+
+تعداد فالوور فعلی:
+${followers}
+
+هدف اصلی:
+${goal}
+
+
+پاسخ را کاملاً فارسی بده.
+
+پاسخ را با بخش‌های زیر ارائه کن:
+
+1. 🎯 تحلیل وضعیت پیج
+
+2. 🧠 مخاطب هدف
+
+3. 🔥 پنج ایده اختصاصی ریلز
+
+برای هر ایده:
+- عنوان
+- Hook سه ثانیه اول
+- نحوه اجرا
+- CTA
+
+4. 📅 برنامه محتوایی ۷ روزه
+
+برای هر روز مشخص کن:
+- نوع محتوا
+- موضوع
+- هدف
+
+5. 🚀 استراتژی افزایش فالوور هدفمند
+
+6. 💬 روش افزایش کامنت، Share و Save
+
+7. ⚠️ سه اشتباه مهم که باید از آنها دوری شود
+
+8. 🏆 مهم‌ترین اقدام برای شروع رشد از امروز
+
+
+قوانین:
+
+- کاملاً فارسی بنویس.
+- کاربردی و حرفه‌ای باش.
+- کلی‌گویی نکن.
+- راهکارهای واقعی بده.
+- از اسپم استفاده نکن.
+- فالو/آنفالو خودکار پیشنهاد نده.
+- دایرکت انبوه پیشنهاد نده.
+- روی رشد ارگانیک تمرکز کن.
+- Hook قوی، Retention، CTA، Share و Save را جدی بگیر.
+
+`;
+
+
+  try{
+
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":"application/json"
+          },
+
+          body:JSON.stringify({
+            prompt:prompt
+          })
+        }
+      );
+
+
+    let data;
+
+    try{
+
+      data = await response.json();
+
+    }catch(jsonError){
+
+      throw new Error(
+        "پاسخ معتبر از سرور دریافت نشد."
+      );
+
+    }
+
+
+    if(!response.ok){
+
+      throw new Error(
+        data &&
+        data.error
+          ? data.error
+          : "خطای سرور Follower AI"
+      );
+
+    }
+
+
+    if(!data.success){
+
+      throw new Error(
+        data.error ||
+        "هوش مصنوعی نتوانست پاسخ بدهد."
+      );
+
+    }
+
+
+    const aiText =
+      extractAIText(data);
+
+
+    if(!aiText){
+
+      throw new Error(
+        "پاسخ هوش مصنوعی خالی است."
+      );
+
+    }
+
+
+    resultBox.innerHTML = `
+
+      <div class="item good">
+
+        <strong>
+          🤖 استراتژی اختصاصی Follower AI
+        </strong>
+
+        <br><br>
+
+        ${formatAIText(aiText)}
+
+      </div>
+
+    `;
+
+
+    document
+      .getElementById("audience")
+      .innerHTML = `
+
+      <div class="item">
+
+        <strong>🧠 مخاطب هدف</strong>
+
+        <br><br>
+
+        مخاطب هدف این پیج توسط
+        Follower AI بر اساس موضوع
+        <strong>${escapeHtml(niche)}</strong>
+        و هدف
+        <strong>${escapeHtml(goal)}</strong>
+        تحلیل شده است.
+
+        <br><br>
+
+        <span class="tag">مخاطب هدفمند</span>
+
+        <span class="tag">آموزش</span>
+
+        <span class="tag">تعامل</span>
+
+        <span class="tag">فیتنس</span>
+
+        <span class="tag">انگیزشی</span>
+
+      </div>
+
+    `;
+
+
+    document
+      .getElementById("ideas")
+      .innerHTML = `
+
+      <div class="item good">
+
+        <strong>
+          🔥 ایده‌های اختصاصی ریلز
+        </strong>
+
+        <br><br>
+
+        پنج ایده اختصاصی به همراه
+        Hook و CTA در پاسخ Follower AI
+        ارائه شده است.
+
+        <br><br>
+
+        <span class="tag">Hook</span>
+
+        <span class="tag">Reels</span>
+
+        <span class="tag">CTA</span>
+
+        <span class="tag">Share</span>
+
+        <span class="tag">Save</span>
+
+      </div>
+
+    `;
+
+
+    document
+      .getElementById("plan")
+      .innerHTML = `
+
+      <div class="item">
+
+        <strong>
+          📅 برنامه محتوایی ۷ روزه
+        </strong>
+
+        <br><br>
+
+        برنامه اختصاصی هفت روزه
+        در پاسخ Follower AI قرار گرفته است.
+
+      </div>
+
+    `;
+
+
+  }catch(error){
+
+    resultBox.innerHTML = `
+
+      <div class="item bad">
+
+        <strong>
+          ❌ خطا در اتصال به Follower AI
+        </strong>
+
+        <br><br>
+
+        ${escapeHtml(
+          error.message ||
+          "خطای ناشناخته"
+        )}
+
+        <br><br>
+
+        لطفاً اتصال Worker و تنظیمات
+        CORS را بررسی کنید.
+
+      </div>
+
+    `;
+
+  }finally{
+
+    button.disabled = false;
+
+    button.innerText =
+      "🚀 ساخت استراتژی با هوش مصنوعی";
+
+  }
+
+}
+
+
+/* ==========================================
+   REEL ANALYSIS
+========================================== */
 
 function analyzeReel(){
 
-const v =
-Number(document.getElementById("views").value) || 0;
+  const v =
+    Number(
+      document.getElementById("views").value
+    ) || 0;
 
-const l =
-Number(document.getElementById("likes").value) || 0;
 
-const c =
-Number(document.getElementById("comments").value) || 0;
+  const l =
+    Number(
+      document.getElementById("likes").value
+    ) || 0;
 
-const s =
-Number(document.getElementById("shares").value) || 0;
 
-const sa =
-Number(document.getElementById("saves").value) || 0;
+  const c =
+    Number(
+      document.getElementById("comments").value
+    ) || 0;
 
-const f =
-Number(document.getElementById("newfollowers").value) || 0;
 
+  const s =
+    Number(
+      document.getElementById("shares").value
+    ) || 0;
 
-if(v <= 0){
 
-document.getElementById("reelResult").innerHTML =
+  const sa =
+    Number(
+      document.getElementById("saves").value
+    ) || 0;
 
-`<div class="item bad">
-⚠️ تعداد بازدید را وارد کن.
-</div>`;
 
-return;
+  const f =
+    Number(
+      document.getElementById("newfollowers").value
+    ) || 0;
 
-}
 
+  const result =
+    document.getElementById("reelResult");
 
-const engagement =
-((l+c+s+sa)/v*100);
 
-const conversion =
-(f/v*100);
+  if(v <= 0){
 
+    result.innerHTML = `
 
-let engagementText;
-let engagementClass;
+      <div class="item bad">
 
-if(engagement < 3){
+        ⚠️ تعداد بازدید را وارد کن.
 
-engagementText =
-"تعامل پایین است. Hook و شروع ریلز باید قوی‌تر شود.";
+      </div>
 
-engagementClass="bad";
+    `;
 
-}
+    return;
 
-else if(engagement < 7){
+  }
 
-engagementText =
-"تعامل متوسط است. روی Share و Save بیشتر تمرکز کن.";
 
-engagementClass="warn";
+  const engagement =
+    ((l+c+s+sa)/v)*100;
 
-}
 
-else{
+  const conversion =
+    (f/v)*100;
 
-engagementText =
-"تعامل عالی است. این سبک محتوا ارزش تکرار دارد.";
 
-engagementClass="good";
+  let engagementText;
 
-}
+  let engagementClass;
 
 
-let conversionText;
+  if(engagement < 3){
 
-if(conversion < 0.5){
+    engagementText =
+      "تعامل پایین است. Hook و شروع ریلز باید قوی‌تر شود.";
 
-conversionText =
-"تبدیل بازدید به فالو پایین است؛ CTA واضح‌تری اضافه کن.";
+    engagementClass =
+      "bad";
 
-}
+  }
 
-else if(conversion < 1){
+  else if(engagement < 7){
 
-conversionText =
-"تبدیل متوسط است؛ دلیل قوی‌تری برای فالو کردن بده.";
+    engagementText =
+      "تعامل متوسط است. روی Share، Save و کامنت بیشتر تمرکز کن.";
 
-}
+    engagementClass =
+      "warn";
 
-else{
+  }
 
-conversionText =
-"تبدیل بازدید به فالو خوب است.";
+  else{
 
-}
+    engagementText =
+      "تعامل عالی است. این سبک محتوا ارزش تکرار و توسعه دارد.";
 
+    engagementClass =
+      "good";
 
-document.getElementById("reelResult").innerHTML = `
+  }
 
-<div class="stat">
 
-<strong>${engagement.toFixed(2)}%</strong>
+  let conversionText;
 
-<br>
 
-<span class="small">نرخ تعامل</span>
+  if(conversion < 0.5){
 
-</div>
+    conversionText =
+      "تبدیل بازدید به فالو پایین است؛ CTA واضح‌تر و دلیل قوی‌تری برای فالو ایجاد کن.";
 
+  }
 
-<div class="stat">
+  else if(conversion < 1){
 
-<strong>${conversion.toFixed(2)}%</strong>
+    conversionText =
+      "تبدیل متوسط است؛ ارزش پیشنهادی پیج را برای مخاطب واضح‌تر کن.";
 
-<br>
+  }
 
-<span class="small">تبدیل به فالو</span>
+  else{
 
-</div>
+    conversionText =
+      "تبدیل بازدید به فالو خوب است. این فرمت محتوا پتانسیل جذب فالوور دارد.";
 
+  }
 
-<div class="item ${engagementClass}">
 
-📌 ${engagementText}
+  result.innerHTML = `
 
-</div>
+    <div class="stat">
 
+      <strong>
+        ${engagement.toFixed(2)}%
+      </strong>
 
-<div class="item">
+      <br>
 
-🎯 ${conversionText}
+      <span class="small">
+        نرخ تعامل
+      </span>
 
-</div>
+    </div>
 
-`;
 
+    <div class="stat">
 
-document.getElementById("nextReel").innerHTML = `
+      <strong>
+        ${conversion.toFixed(2)}%
+      </strong>
 
-<div class="item">
+      <br>
 
-<strong>🔥 ریلز پیشنهادی بعدی</strong>
+      <span class="small">
+        تبدیل به فالو
+      </span>
 
-<br><br>
+    </div>
 
-یک ریلز کوتاه با این ساختار بساز:
 
-<br><br>
+    <div class="item ${engagementClass}">
 
-<strong>ثانیه ۰ تا ۳:</strong>
+      📌 ${engagementText}
 
-یک Hook بسیار قوی.
+    </div>
 
-<br>
 
-<strong>ثانیه ۳ تا ۱۰:</strong>
+    <div class="item">
 
-نمایش نتیجه یا چالش.
+      🎯 ${conversionText}
 
-<br>
+    </div>
 
-<strong>ثانیه ۱۰ تا ۲۰:</strong>
 
-آموزش یا نکته اصلی.
+    <div class="item">
 
-<br>
+      <strong>
+        📊 خلاصه عملکرد ریلز
+      </strong>
 
-<strong>پایان:</strong>
+      <br><br>
 
-«اگر قسمت بعدی رو می‌خوای، پیج رو فالو کن.»
+      👁️ بازدید:
+      ${v.toLocaleString("fa-IR")}
 
-</div>
+      <br>
 
-`;
+      ❤️ لایک:
+      ${l.toLocaleString("fa-IR")}
+
+      <br>
+
+      💬 کامنت:
+      ${c.toLocaleString("fa-IR")}
+
+      <br>
+
+      📤 اشتراک‌گذاری:
+      ${s.toLocaleString("fa-IR")}
+
+      <br>
+
+      🔖 ذخیره:
+      ${sa.toLocaleString("fa-IR")}
+
+      <br>
+
+      👤 فالوور جدید:
+      ${f.toLocaleString("fa-IR")}
+
+    </div>
+
+  `;
+
+
+  document
+    .getElementById("nextReel")
+    .innerHTML = `
+
+    <div class="item good">
+
+      <strong>
+        🔥 ریلز پیشنهادی بعدی
+      </strong>
+
+      <br><br>
+
+      <strong>
+        ثانیه ۰ تا ۳:
+      </strong>
+
+      <br>
+
+      یک Hook بسیار قوی و مستقیم.
+
+      <br><br>
+
+      <strong>
+        ثانیه ۳ تا ۱۰:
+      </strong>
+
+      <br>
+
+      نمایش نتیجه، مشکل یا چالش.
+
+      <br><br>
+
+      <strong>
+        ثانیه ۱۰ تا ۲۰:
+      </strong>
+
+      <br>
+
+      ارائه نکته اصلی یا راه‌حل.
+
+      <br><br>
+
+      <strong>
+        پایان:
+      </strong>
+
+      <br>
+
+      یک CTA واضح برای کامنت،
+      Share یا Follow.
+
+      <br><br>
+
+      🎯 هدف:
+      افزایش Retention، Share، Save
+      و تبدیل بازدیدکننده به فالوور.
+
+    </div>
+
+  `;
 
 }
 
