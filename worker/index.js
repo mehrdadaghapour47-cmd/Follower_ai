@@ -72,11 +72,25 @@ export default {
 
       if (typeof result === "string") {
         aiText = result;
-      } else if (result?.response && typeof result.response === "string") {
+      } else if (
+        result?.response &&
+        typeof result.response === "string"
+      ) {
         aiText = result.response;
-      } else if (result?.output_text && typeof result.output_text === "string") {
+      } else if (
+        result?.choices?.[0]?.message?.content &&
+        typeof result.choices[0].message.content === "string"
+      ) {
+        aiText = result.choices[0].message.content;
+      } else if (
+        result?.output_text &&
+        typeof result.output_text === "string"
+      ) {
         aiText = result.output_text;
-      } else if (result?.text && typeof result.text === "string") {
+      } else if (
+        result?.text &&
+        typeof result.text === "string"
+      ) {
         aiText = result.text;
       } else if (result) {
         aiText = JSON.stringify(result);
