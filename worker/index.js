@@ -18,6 +18,7 @@ function json(data, status = 200) {
 export default {
   async fetch(request, env) {
 
+    // Handle CORS preflight
     if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
@@ -25,6 +26,7 @@ export default {
       });
     }
 
+    // Only GET requests are allowed
     if (request.method !== "GET") {
       return json({
         success: false,
@@ -36,6 +38,7 @@ export default {
       const url = new URL(request.url);
       const prompt = (url.searchParams.get("prompt") || "").trim();
 
+      // Health check
       if (!prompt) {
         return json({
           success: true,
@@ -44,6 +47,7 @@ export default {
         });
       }
 
+      // Check Workers AI binding
       if (!env.AI) {
         return json({
           success: false,
@@ -51,6 +55,7 @@ export default {
         }, 500);
       }
 
+      // Send request to Cloudflare Workers AI
       const result = await env.AI.run(
         "@cf/zai-org/glm-4.7-flash",
         {
@@ -58,7 +63,7 @@ export default {
             {
               role: "system",
               content:
-                "تو Follower AI هستی؛ یک استراتژیست حرفه‌ای رشد ارگانیک اینستاگرام. همیشه فارسی، دقیق، کاربردی و حرفه‌ای پاسخ بده. روی فالوور هدفمند، ایده ریلز، Hook، CTA، Retention، تعامل، Share، Save و برند شخصی تمرکز کن. هرگز اسپم، فالو/آنفالو خودکار یا دایرکت انبوه پیشنهاد نده."
+                "تو Follower AI هستی؛ یک استراتژیست حرفه‌ای رشد ارگانیک اینستاگرام. همیشه فارسی، دقیق، کاربردی و حرفه‌ای پاسخ بده. روی فالوور هدفمند، ایده ریلز، Hook، CTA، Retention، تعامل، Share، Save و برند شخصی تمرکز کن. هرگز اسپم، فالو/آنفالو خودکار یا دایرکت انبوه پیشنهاد نده. پاسخ نهایی را فقط برای کاربر بنویس و هرگز reasoning یا فرایند فکر کردن داخلی را نمایش نده."
             },
             {
               role: "user",
@@ -68,20 +73,35 @@ export default {
         }
       );
 
+      // Extract ONLY the final AI response text
       let aiText = "";
 
-      if (typeof result === "string") {
-        aiText = result;
-      } else if (result?.response && typeof result.response === "string") {
+      if (
+        result?.choices?.[0]?.message?.content &&
+        typeof result.choices[0].message.content === "string"
+      ) {
+        aiText = result.choices[0].message.content;
+
+      } else if (
+        result?.response &&
+        typeof result.response === "string"
+      ) {
         aiText = result.response;
-      } else if (result?.output_text && typeof result.output_text === "string") {
+
+      } else if (
+        result?.output_text &&
+        typeof result.output_text === "string"
+      ) {
         aiText = result.output_text;
-      } else if (result?.text && typeof result.text === "string") {
+
+      } else if (
+        result?.text &&
+        typeof result.text === "string"
+      ) {
         aiText = result.text;
-      } else if (result) {
-        aiText = JSON.stringify(result);
       }
 
+      // Make sure AI returned actual text
       if (!aiText || !aiText.trim()) {
         return json({
           success: false,
@@ -89,9 +109,10 @@ export default {
         }, 502);
       }
 
+      // Return clean response to frontend
       return json({
         success: true,
-        response: aiText
+        response: aiText.trim()
       });
 
     } catch (error) {
