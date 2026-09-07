@@ -1,6 +1,8 @@
+import { handleInstagramWebhook } from "./instagram.js";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "*",
   "Cache-Control": "no-store"
 };
@@ -18,7 +20,6 @@ function json(data, status = 200) {
 export default {
   async fetch(request, env) {
 
-    // Handle CORS preflight
     if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
@@ -26,16 +27,22 @@ export default {
       });
     }
 
-    // Only GET requests are allowed
+    const url = new URL(request.url);
+
+    // Instagram Webhook
+    if (url.pathname === "/webhooks/instagram") {
+      return handleInstagramWebhook(request, env);
+    }
+
+    // Only GET for AI endpoint
     if (request.method !== "GET") {
       return json({
         success: false,
-        error: "Only GET is allowed"
+        error: "Only GET is allowed on the AI endpoint"
       }, 405);
     }
 
     try {
-      const url = new URL(request.url);
       const prompt = (url.searchParams.get("prompt") || "").trim();
 
       // Health check
@@ -43,11 +50,11 @@ export default {
         return json({
           success: true,
           message: "🔥 Follower AI is online",
-          ai: !!env.AI
+          ai: !!env.AI,
+          instagramWebhook: "/webhooks/instagram"
         });
       }
 
-      // Check Workers AI binding
       if (!env.AI) {
         return json({
           success: false,
@@ -55,7 +62,6 @@ export default {
         }, 500);
       }
 
-      // Send request to Cloudflare Workers AI
       const result = await env.AI.run(
         "@cf/zai-org/glm-4.7-flash",
         {
@@ -63,7 +69,7 @@ export default {
             {
               role: "system",
               content:
-                "تو Follower AI هستی؛ یک استراتژیست حرفه‌ای رشد ارگانیک اینستاگرام. همیشه فارسی، دقیق، کاربردی و حرفه‌ای پاسخ بده. روی فالوور هدفمند، ایده ریلز، Hook، CTA، Retention، تعامل، Share، Save و برند شخصی تمرکز کن. هرگز اسپم، فالو/آنفالو خودکار یا دایرکت انبوه پیشنهاد نده. پاسخ نهایی را فقط برای کاربر بنویس و هرگز reasoning یا فرایند فکر کردن داخلی را نمایش نده."
+                "تو Follower AI هستی؛ یک استراتژیست حرفه‌ای رشد ارگانیک اینستاگرام. همیشه فارسی، دقیق، کاربردی و حرفه‌ای پاسخ بده. روی فالوور هدفمند، ایده ریلز، Hook، CTA، Retention، تعامل، Share، Save و برند شخصی تمرکز کن. هرگز اسپم، فالو/آنفالو خودکار یا دایرکت انبوه پیشنهاد نده."
             },
             {
               role: "user",
@@ -73,7 +79,6 @@ export default {
         }
       );
 
-      // Extract ONLY the final AI response text
       let aiText = "";
 
       if (
@@ -81,19 +86,16 @@ export default {
         typeof result.choices[0].message.content === "string"
       ) {
         aiText = result.choices[0].message.content;
-
       } else if (
         result?.response &&
         typeof result.response === "string"
       ) {
         aiText = result.response;
-
       } else if (
         result?.output_text &&
         typeof result.output_text === "string"
       ) {
         aiText = result.output_text;
-
       } else if (
         result?.text &&
         typeof result.text === "string"
@@ -101,7 +103,6 @@ export default {
         aiText = result.text;
       }
 
-      // Make sure AI returned actual text
       if (!aiText || !aiText.trim()) {
         return json({
           success: false,
@@ -109,7 +110,6 @@ export default {
         }, 502);
       }
 
-      // Return clean response to frontend
       return json({
         success: true,
         response: aiText.trim()
