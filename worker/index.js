@@ -223,7 +223,7 @@ async function handleAiPrompt(request, env, prompt) {
   return json(request, env, { success: true, response: answer });
 }
 
-export const internals = { findKeywordRule, parseRules, extractCommentEvents, timingSafeEqual, verifySignature };
+export const internals = { getAiText, findKeywordRule, parseRules, extractCommentEvents, timingSafeEqual, verifySignature };
 
 export default {
   async fetch(request, env) {
