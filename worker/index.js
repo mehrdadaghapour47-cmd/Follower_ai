@@ -38,6 +38,40 @@ function log(level, message, details = {}) {
   console[level](JSON.stringify({ service: "follower-ai", level, message, ...details }));
 }
 
+function extractCompletionText(value) {
+  if (!value || typeof value !== "object") return "";
+
+  const content = value.choices?.[0]?.message?.content;
+
+  if (typeof content === "string") return content;
+
+  if (Array.isArray(content)) {
+    return content.map((part) => typeof part === "string" ? part : part?.text || "").join("");
+  }
+
+  if (typeof value.output_text === "string") return value.output_text;
+  if (typeof value.text === "string") return value.text;
+
+  return "";
+}
+
+function getAiText(result) {
+  if (typeof result === "string") {
+    try {
+      const parsed = JSON.parse(result);
+      const completion = extractCompletionText(parsed);
+
+      if (completion) return completion;
+    } catch {
+      // Plain text response.
+    }
+
+    return result;
+  }
+
+  return extractCompletionText(result) || (typeof result?.response === "string" ? result.response : "");
+}
+
 function parseRules(env) {
   const raw = env.KEYWORD_RULES || "[]";
   try {
@@ -61,14 +95,6 @@ function parseRules(env) {
 function findKeywordRule(textValue, rules) {
   const normalized = String(textValue || "").toLocaleLowerCase();
   return rules.find((rule) => rule.keywords.some((keyword) => normalized.includes(keyword))) || null;
-}
-
-function getAiText(result) {
-  if (typeof result === "string") return result;
-  if (typeof result?.response === "string") return result.response;
-  if (typeof result?.output_text === "string") return result.output_text;
-  if (typeof result?.text === "string") return result.text;
-  return result ? JSON.stringify(result) : "";
 }
 
 async function generateAiReply(env, commentText, rule) {
