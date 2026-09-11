@@ -6,6 +6,7 @@ import { auditContent } from "./modules/audit/content.js";
 import { auditVisual } from "./modules/audit/visual.js";
 import { auditVideo } from "./modules/audit/video.js";
 import { calculateScore } from "./modules/scoring/score.js";
+import { analyzeWithAI } from "./modules/ai/analyzer.js";
 import { buildFixPlan } from "./modules/strategy/fixer.js";
 import { build30DayPlan } from "./modules/strategy/planner.js";
 
@@ -255,6 +256,11 @@ async function handleAudit(request, env) {
       engagement: Number(body.engagementScore ?? 0),
       conversion: Number(body.conversionScore ?? 0)
     });
+    const aiAnalysis = await analyzeWithAI(env, {
+      input: validated,
+      audit: { profile, content, visual, video },
+      score
+    });
     const weaknesses = [
       ...(profile.weaknesses || []),
       ...(content.weaknesses || []),
@@ -275,6 +281,7 @@ async function handleAudit(request, env) {
       },
       audit: { profile, content, visual, video },
       score,
+      ai: aiAnalysis,
       fixes: buildFixPlan({ weaknesses }),
       plan: build30DayPlan()
     });
