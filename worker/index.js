@@ -1,5 +1,13 @@
 const DEFAULT_MODEL = "@cf/zai-org/glm-4.7-flash";
 const GRAPH_BASE_URL = "https://graph.facebook.com";
+import { validateInstagramInput } from "./modules/security/validation.js";
+import { auditProfile } from "./modules/audit/profile.js";
+import { auditContent } from "./modules/audit/content.js";
+import { auditVisual } from "./modules/audit/visual.js";
+import { auditVideo } from "./modules/audit/video.js";
+import { calculateScore } from "./modules/scoring/score.js";
+import { buildFixPlan } from "./modules/strategy/fixer.js";
+import { build30DayPlan } from "./modules/strategy/planner.js";
 
 function getAllowedOrigin(request, env) {
   const origin = request.headers.get("Origin");
@@ -223,6 +231,63 @@ async function handleAiPrompt(request, env, prompt) {
   return json(request, env, { success: true, response: answer });
 }
 
+async function handleAudit(request, env) {
+  const id = requestId(request);
+
+  try {
+    const body = await request.json();
+    const input = body?.input || body?.username || body?.url;
+    const validated = validateInstagramInput(input);
+
+    if (!validated.valid) {
+      return json(request, env, { success: false, requestId: id, error: "INVALID_INSTAGRAM_INPUT" }, 400);
+    }
+
+    const profile = auditProfile(body.profile || { username: validated.value });
+    const content = auditContent(Array.isArray(body.content) ? body.content : []);
+    const visual = auditVisual(body.media || {});
+    const video = auditVideo(body.video || {});
+    const score = calculateScore({
+      profile: profile.score,
+      content: content.score,
+      reels: Number(body.reelsScore ?? content.score),
+      visual: visual.score ?? 0,
+      engagement: Number(body.engagementScore ?? 0),
+      conversion: Number(body.conversionScore ?? 0)
+    });
+    const weaknesses = [
+      ...(profile.weaknesses || []),
+      ...(content.weaknesses || []),
+      ...(visual.weaknesses || []),
+      ...(video.weaknesses || [])
+    ];
+
+    return json(request, env, {
+      success: true,
+      requestId: id,
+      input: validated,
+      coverage: {
+        profile: true,
+        content: Array.isArray(body.content) && body.content.length > 0,
+        visual: Boolean(body.media),
+        video: Boolean(body.video),
+        instagramApi: false
+      },
+      audit: { profile, content, visual, video },
+      score,
+      fixes: buildFixPlan({ weaknesses }),
+      plan: build30DayPlan()
+    });
+  } catch (error) {
+    return json(request, env, {
+      success: false,
+      requestId: id,
+      error: "AUDIT_FAILED",
+      message: error instanceof Error ? error.message : "Unknown error"
+    }, 500);
+  }
+}
+
 export const internals = { getAiText, findKeywordRule, parseRules, extractCommentEvents, timingSafeEqual, verifySignature };
 
 export default {
@@ -237,6 +302,7 @@ export default {
         return text(request, env, url.searchParams.get("hub.challenge") || "");
       }
       if (request.method === "POST" && (url.pathname === "/webhook" || url.pathname === "/webhooks/instagram")) return handleWebhook(request, env, id);
+      if (request.method === "POST" && url.pathname === "/api/audit") return handleAudit(request, env);
       if (request.method === "GET" && url.pathname === "/api/test/keyword") return handleTestKeyword(request, env);
       if (request.method === "GET") {
         const prompt = (url.searchParams.get("prompt") || "").trim();
