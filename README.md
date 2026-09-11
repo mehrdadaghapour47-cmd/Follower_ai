@@ -38,6 +38,12 @@ npx wrangler secret put META_INSTAGRAM_ACCOUNT_ID
 npx wrangler secret put TEST_ENDPOINT_TOKEN
 ```
 
+Set the non-secret permission declaration to the permissions granted to the token:
+
+```bash
+npx wrangler deploy --var META_PERMISSIONS:instagram_basic,pages_show_list,pages_read_engagement
+```
+
 Set non-secret variables for the deployment. `KEYWORD_RULES` is JSON and may be set as a Wrangler variable or secret when its reply/DM text should not be public:
 
 ```bash
@@ -59,10 +65,12 @@ For repeatable deployments, put these non-secret values in an environment-specif
 
 The Worker uses these official Graph API operations:
 
+- `GET /{ig-user-id}` for the connected professional account profile.
+- `GET /{ig-user-id}/media` for media and pagination; items marked by Meta as `REELS` are exposed as reels.
 - `POST /{comment-id}/replies` for comment replies.
 - `POST /{ig-user-id}/messages` with an Instagram-scoped recipient ID for DMs.
 
-Meta permissions, account eligibility, recipient consent/window rules, and version availability are controlled by Meta and must be confirmed in the current Meta documentation before production activation.
+The audit connector requires `META_INSTAGRAM_ACCOUNT_ID` and does not scrape or search Instagram usernames. The selected official Graph API flow does not provide arbitrary public username lookup; the submitted username remains the manual-audit identifier unless the configured account ID is available. Meta permissions, account eligibility, recipient consent/window rules, and version availability are controlled by Meta and must be confirmed in the current Meta documentation before production activation.
 
 ## Keyword rules
 

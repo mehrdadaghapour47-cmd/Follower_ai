@@ -7,6 +7,7 @@ import { auditVisual } from "./modules/audit/visual.js";
 import { auditVideo } from "./modules/audit/video.js";
 import { calculateScore } from "./modules/scoring/score.js";
 import { analyzeWithAI } from "./modules/ai/analyzer.js";
+import { fetchInstagramData } from "./modules/instagram/connector.js";
 import { buildFixPlan } from "./modules/strategy/fixer.js";
 import { build30DayPlan } from "./modules/strategy/planner.js";
 
@@ -244,14 +245,22 @@ async function handleAudit(request, env) {
       return json(request, env, { success: false, requestId: id, error: "INVALID_INSTAGRAM_INPUT" }, 400);
     }
 
-    const profile = auditProfile(body.profile || { username: validated.value });
-    const content = auditContent(Array.isArray(body.content) ? body.content : []);
+    const instagram = await fetchInstagramData(env, {
+      instagramUserId: body.instagramUserId || body.instagramAccountId
+    });
+    const profileInput = instagram.profile || body.profile || { username: validated.value };
+    const contentInput = instagram.integration.status === "connected"
+      ? instagram.content
+      : (Array.isArray(body.content) ? body.content : []);
+    const profile = auditProfile(profileInput);
+    const content = auditContent(contentInput);
     const visual = auditVisual(body.media || {});
     const video = auditVideo(body.video || {});
+    const reels = instagram.integration.status === "connected" ? instagram.reels : [];
     const score = calculateScore({
       profile: profile.score,
       content: content.score,
-      reels: Number(body.reelsScore ?? content.score),
+      reels: Number(body.reelsScore ?? (reels.length ? auditContent(reels).score : content.score)),
       visual: visual.score ?? 0,
       engagement: Number(body.engagementScore ?? 0),
       conversion: Number(body.conversionScore ?? 0)
@@ -277,8 +286,9 @@ async function handleAudit(request, env) {
         content: Array.isArray(body.content) && body.content.length > 0,
         visual: Boolean(body.media),
         video: Boolean(body.video),
-        instagramApi: false
+        instagramApi: instagram.integration.status === "connected"
       },
+      integration: { instagram: instagram.integration },
       audit: { profile, content, visual, video },
       score,
       ai: aiAnalysis,
