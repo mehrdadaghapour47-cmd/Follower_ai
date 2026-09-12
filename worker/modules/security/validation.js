@@ -11,7 +11,7 @@ export function validateInstagramInput(value = "") {
 		return { valid: true, type: "profile_url", value: username };
 	}
 
-	if (/^@?[A-Za-z0-9._]{1,30}$/.test(input)) {
+	if (/^@?[A-Za-z0-9._-]{1,30}$/.test(input)) {
 		return { valid: true, type: "username", value: normalizeUsername(input) };
 	}
 
