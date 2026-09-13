@@ -1000,23 +1000,40 @@ console.log(
 
 <section id="follower-ai-2" dir="rtl">
   <div class="fa2-card">
-    <h2>🔥 Follower AI 2.0 — Deep Audit</h2>
-    <p>تحلیل عمیق پیج، نقاط ضعف، امتیاز رشد و برنامه اصلاحی</p>
+      <h2>🔥 Follower AI 2.0 — Deep Audit</h2>
+      <p>تحلیل عمیق پیج، محتوا، ریلز، تعامل و تبدیل فالوور</p>
 
-    <input id="fa2Input" type="text" placeholder="@username یا لینک پروفایل اینستاگرام">
-    <button id="fa2Audit" type="button">🚀 شروع Deep Audit</button>
+      <input id="fa2Input" type="text" placeholder="@username یا لینک پروفایل اینستاگرام">
 
-    <div id="fa2Status" role="status" aria-live="polite"></div>
-    <div id="fa2Result"></div>
-  </div>
+      <div class="fa2-form">
+        <input id="fa2Bio" type="text" placeholder="Bio پیج">
+        <input id="fa2Followers" type="number" placeholder="تعداد فالوورها">
+        <input id="fa2Posts" type="number" placeholder="تعداد پست‌ها">
+        <input id="fa2Views" type="number" placeholder="میانگین بازدید ریلز">
+        <input id="fa2Likes" type="number" placeholder="میانگین لایک">
+        <input id="fa2Comments" type="number" placeholder="میانگین کامنت">
+        <input id="fa2Shares" type="number" placeholder="میانگین Share">
+        <input id="fa2Saves" type="number" placeholder="میانگین Save">
+        <input id="fa2NewFollowers" type="number" placeholder="فالوور جدید از محتوا">
+        <textarea id="fa2Content" placeholder="اطلاعات ریلز/پست‌ها، Hook، CTA، کپشن یا هر داده واقعی دیگری که داری"></textarea>
+      </div>
+
+      <button id="fa2Audit" type="button">🚀 شروع Deep Audit 2.0</button>
+
+      <div id="fa2Status" role="status" aria-live="polite"></div>
+      <div id="fa2Result"></div>
+    </div>
 </section>
 
 <style>
 #follower-ai-2{margin:32px auto;max-width:1000px;padding:16px;font-family:inherit}
 .fa2-card{background:#111;color:#fff;border-radius:24px;padding:24px;box-shadow:0 12px 40px #0004}
 .fa2-card h2{margin-top:0}
+.fa2-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.fa2-form input,.fa2-form textarea{width:100%;box-sizing:border-box;padding:13px;border-radius:12px;border:1px solid #444;background:#1b1b1b;color:#fff}
+.fa2-form textarea{grid-column:1/-1;min-height:110px;resize:vertical}
 #fa2Input{width:100%;box-sizing:border-box;padding:15px;border-radius:12px;border:1px solid #444;background:#1b1b1b;color:#fff;margin:14px 0}
-#fa2Audit{width:100%;padding:15px;border:0;border-radius:12px;font-weight:700;cursor:pointer}
+#fa2Audit{width:100%;padding:15px;margin-top:14px;border:0;border-radius:12px;font-weight:700;cursor:pointer}
 #fa2Audit:disabled{opacity:.6;cursor:wait}
 #fa2Status{margin:16px 0;min-height:1.5em}
 .fa2-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:18px}
@@ -1025,7 +1042,6 @@ console.log(
 .fa2-list{line-height:2}
 .fa2-ok{color:#65e572}
 .fa2-bad{color:#ff6b6b}
-.fa2-warn{color:#ffd166}
 </style>
 
 <script>
@@ -1036,37 +1052,69 @@ console.log(
   const status = document.getElementById("fa2Status");
   const result = document.getElementById("fa2Result");
 
-  const esc = (value) => String(value ?? "")
+  const value = id => document.getElementById(id)?.value?.trim() || "";
+  const number = id => {
+    const v = value(id);
+    return v === "" ? undefined : Number(v);
+  };
+
+  const esc = value => String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
 
-  const list = (items) => Array.isArray(items) && items.length
-    ? `<ul class="fa2-list">${items.map((item) => `<li>${esc(typeof item === "string" ? item : JSON.stringify(item))}</li>`).join("")}</ul>`
+  const list = items => Array.isArray(items) && items.length
+    ? `<ul class="fa2-list">${items.map(x => `<li>${esc(typeof x === "string" ? x : JSON.stringify(x))}</li>`).join("")}</ul>`
     : "<p>موردی ثبت نشده</p>";
 
-  const planList = (plan) => plan?.phases?.length
-    ? list(plan.phases.map((phase) => `${phase.days}: ${phase.focus}`))
-    : "<p>برنامه‌ای ثبت نشده</p>";
-
   button.addEventListener("click", async () => {
-    const value = input.value.trim();
+    const username = input.value.trim();
 
-    if (!value) {
+    if (!username) {
       status.innerHTML = '<span class="fa2-bad">لینک یا نام کاربری را وارد کن.</span>';
       return;
     }
 
     button.disabled = true;
-    status.textContent = "⏳ در حال تحلیل...";
+    status.textContent = "⏳ در حال تحلیل Deep Audit 2.0...";
     result.innerHTML = "";
+
+    const contentText = value("fa2Content");
+    const payload = {
+      input: username,
+      profile: {
+        username,
+        bio: value("fa2Bio"),
+        followers_count: number("fa2Followers"),
+        media_count: number("fa2Posts")
+      },
+      content: [],
+      media: {},
+      video: {}
+    };
+
+    const numericContent = [
+      ["views", "fa2Views"],
+      ["like_count", "fa2Likes"],
+      ["comments_count", "fa2Comments"],
+      ["shares", "fa2Shares"],
+      ["saves", "fa2Saves"]
+    ];
+
+    const item = { id: "manual-1", caption: contentText };
+    for (const [key, id] of numericContent) {
+      const n = number(id);
+      if (n !== undefined) item[key] = n;
+    }
+
+    if (Object.keys(item).length > 2) payload.content.push(item);
 
     try {
       const response = await fetch(`${API}/api/audit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: value, profile: { username: value }, content: [] })
+        body: JSON.stringify(payload)
       });
       const data = await response.json();
 
@@ -1074,27 +1122,31 @@ console.log(
         throw new Error(data.message || data.error || "Audit failed");
       }
 
+      const audit = data.audit || {};
       const weaknesses = [
-        ...(data.audit?.profile?.weaknesses || []),
-        ...(data.audit?.content?.weaknesses || []),
-        ...(data.audit?.visual?.weaknesses || []),
-        ...(data.audit?.video?.weaknesses || [])
+        ...(audit.profile?.weaknesses || []),
+        ...(audit.content?.weaknesses || []),
+        ...(audit.visual?.weaknesses || []),
+        ...(audit.video?.weaknesses || [])
       ];
 
       result.innerHTML = `
         <div class="fa2-grid">
-          <div class="fa2-box"><small>امتیاز کلی</small><div class="fa2-score">${esc(data.score?.overall ?? 0)}/100</div></div>
-          <div class="fa2-box"><small>سطح</small><div>${esc(data.score?.level ?? "unknown")}</div></div>
-          <div class="fa2-box"><small>Profile</small><div>${esc(data.audit?.profile?.score ?? 0)}/100</div></div>
-          <div class="fa2-box"><small>Content</small><div>${esc(data.audit?.content?.score ?? 0)}/100</div></div>
+          <div class="fa2-box"><small>امتیاز کلی</small><div class="fa2-score">${esc(data.score?.overall ?? "—")}/100</div></div>
+          <div class="fa2-box"><small>سطح</small><div>${esc(data.score?.level ?? "—")}</div></div>
+          <div class="fa2-box"><small>Profile</small><div>${esc(audit.profile?.score ?? "—")}/100</div></div>
+          <div class="fa2-box"><small>Content</small><div>${esc(audit.content?.score ?? "—")}/100</div></div>
         </div>
         <div class="fa2-grid">
           <div class="fa2-box"><h3>📡 پوشش تحلیل</h3>${list(Object.entries(data.coverage || {}).map(([key, value]) => `${key}: ${value ? "فعال" : "در دسترس نیست"}`))}</div>
           <div class="fa2-box"><h3>⚠️ نقاط ضعف</h3>${list(weaknesses)}</div>
         </div>
-        <div class="fa2-box" style="margin-top:12px"><h3>🛠 اصلاحات پیشنهادی</h3>${list(data.fixes)}</div>
-        <div class="fa2-box" style="margin-top:12px"><h3>📅 برنامه ۳۰ روزه</h3>${planList(data.plan)}</div>`;
-      status.innerHTML = '<span class="fa2-ok">✅ تحلیل با موفقیت انجام شد</span>';
+        <div class="fa2-box" style="margin-top:12px">
+          <h3>🧠 تحلیل AI</h3>
+          ${esc(data.ai?.result?.summary || "تحلیل ساختاری AI در دسترس نیست")}
+        </div>
+        <div class="fa2-box" style="margin-top:12px"><h3>🛠 اصلاحات پیشنهادی</h3>${list(data.fixes)}</div>`;
+      status.innerHTML = '<span class="fa2-ok">✅ Deep Audit با موفقیت انجام شد</span>';
     } catch (error) {
       status.innerHTML = `<span class="fa2-bad">❌ ${esc(error.message)}</span>`;
     } finally {
