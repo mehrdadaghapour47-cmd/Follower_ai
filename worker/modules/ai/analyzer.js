@@ -1,3 +1,5 @@
+import { DEEP_AUDIT_SYSTEM_PROMPT } from "./prompts.js";
+
 function extractJson(text) {
 	const cleaned = String(text || "")
 		.replace(/```json/gi, "")
@@ -30,10 +32,11 @@ export async function analyzeWithAI(env, payload = {}) {
 
 	const model = env.AI_MODEL || "@cf/zai-org/glm-4.7-flash";
 	const prompt = [
-		"You are Follower AI 2.0.",
-		"Analyze ONLY the supplied Instagram data.",
-		"Never invent unavailable data.",
-		"Return valid JSON only.",
+		"Perform a complete Follower AI 2.0 Deep Audit.",
+		"Use ONLY the supplied data.",
+		"Do not guess or fabricate missing information.",
+		"If visual or video evidence is absent, explicitly report it in missingData.",
+		"Return JSON matching the requested schema.",
 		"",
 		JSON.stringify(payload)
 	].join("\n");
@@ -45,7 +48,10 @@ export async function analyzeWithAI(env, payload = {}) {
 					role: "system",
 					content: "Return JSON only. Never fabricate unavailable Instagram data."
 				},
-				{ role: "user", content: prompt }
+				{
+					role: "user",
+					content: prompt
+				}
 			]
 		});
 
@@ -55,7 +61,10 @@ export async function analyzeWithAI(env, payload = {}) {
 		return {
 			available: true,
 			model,
-			result: parsed || { summary: text }
+			result: parsed || {
+				summary: text,
+				parseWarning: "AI_RESPONSE_NOT_VALID_JSON"
+			}
 		};
 	} catch (error) {
 		return {

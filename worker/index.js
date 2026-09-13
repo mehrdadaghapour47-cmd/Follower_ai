@@ -252,10 +252,25 @@ async function handleAudit(request, env) {
     const contentInput = instagram.integration.status === "connected"
       ? instagram.content
       : (Array.isArray(body.content) ? body.content : []);
-    const profile = auditProfile(profileInput);
+    const manualProfile = body?.profile && typeof body.profile === "object"
+      ? body.profile
+      : {};
+    const manualMedia = body?.media && typeof body.media === "object"
+      ? body.media
+      : {};
+    const manualVideo = body?.video && typeof body.video === "object"
+      ? body.video
+      : {};
+    const auditSource = instagram.integration.status === "connected"
+      ? "instagram_api"
+      : "manual_data";
+    const profile = auditProfile({
+      ...manualProfile,
+      ...profileInput
+    });
     const content = auditContent(contentInput);
-    const visual = auditVisual(body.media || {});
-    const video = auditVideo(body.video || {});
+    const visual = auditVisual(manualMedia);
+    const video = auditVideo(manualVideo);
     const reels = instagram.integration.status === "connected" ? instagram.reels : [];
     const score = calculateScore({
       profile: profile.score,
@@ -289,6 +304,7 @@ async function handleAudit(request, env) {
         instagramApi: instagram.integration.status === "connected"
       },
       integration: { instagram: instagram.integration },
+      auditSource,
       audit: { profile, content, visual, video },
       score,
       ai: aiAnalysis,
