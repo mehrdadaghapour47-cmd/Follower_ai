@@ -662,21 +662,30 @@ setStatus(
 
 try{
 
-/*
-  مهم:
-  Worker فعلی GET است.
-  بنابراین دیگر POST و JSON body نداریم.
-*/
-
-const url =
-API_URL +
-"?prompt=" +
-encodeURIComponent(prompt);
-
-
 const response =
-await fetch(url, {
-method:"GET",
+await fetch(API_URL + "/api/audit", {
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+input:getValue("topic"),
+profile:{
+username:getValue("topic"),
+bio:getValue("extra"),
+followers_count:Number(getValue("followers")) || 0,
+media_count:0
+},
+content:[{
+views:Number(getValue("views")) || 0,
+likes:Number(getValue("likes")) || 0,
+comments:Number(getValue("comments")) || 0,
+shares:Number(getValue("shares")) || 0,
+saves:Number(getValue("saves")) || 0,
+newFollowers:Number(getValue("newFollowers")) || 0,
+caption:getValue("extra")
+}]
+}),
 cache:"no-store"
 });
 
