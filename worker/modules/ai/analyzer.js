@@ -28,7 +28,17 @@ function extractAIText(value) {
 	}
 
 	if (value && typeof value === "object") {
-		for (const key of ["response", "output_text", "text", "content", "message"]) {
+		for (const key of [
+			"response",
+			"output_text",
+			"generated_text",
+			"text",
+			"content",
+			"message",
+			"choices",
+			"output",
+			"data"
+		]) {
 			const text = extractAIText(value[key]);
 			if (text) return text;
 		}
@@ -76,6 +86,11 @@ export async function analyzeWithAI(env, payload = {}) {
 
 		const fallbackText = text.trim();
 		const extracted = extractJson(fallbackText);
+		const hasKnownResultShape =
+			result &&
+			typeof result === "object" &&
+			["response", "result", "output_text", "generated_text", "text", "content", "message", "choices", "output", "data"]
+				.some((key) => key in result);
 		const parsed =
 			extracted && typeof extracted === "object"
 				? extracted
@@ -83,6 +98,8 @@ export async function analyzeWithAI(env, payload = {}) {
 					? result.response
 					: result && typeof result === "object" && result.result && typeof result.result === "object"
 						? result.result
+						: result && typeof result === "object" && !Array.isArray(result) && !hasKnownResultShape
+							? result
 						: null;
 
 		return {
