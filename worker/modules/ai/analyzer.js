@@ -20,6 +20,23 @@ function extractJson(text) {
 	return null;
 }
 
+function extractAIText(value) {
+	if (typeof value === "string") return value.trim();
+
+	if (Array.isArray(value)) {
+		return value.map(extractAIText).filter(Boolean).join("\n").trim();
+	}
+
+	if (value && typeof value === "object") {
+		for (const key of ["response", "output_text", "text", "content", "message"]) {
+			const text = extractAIText(value[key]);
+			if (text) return text;
+		}
+	}
+
+	return "";
+}
+
 export async function analyzeWithAI(env, payload = {}) {
 	if (!env?.AI?.run) {
 		return {
@@ -49,13 +66,32 @@ export async function analyzeWithAI(env, payload = {}) {
 			]
 		});
 
-		const text = result?.response || result?.result?.response || result?.output_text || "";
-		const parsed = extractJson(text);
+		const text = extractAIText(
+			result?.response ??
+				result?.result ??
+					result?.output_text ??
+						result?.text ??
+							result
+		);
+
+		const fallbackText = text.trim();
+		const extracted = extractJson(fallbackText);
+		const parsed =
+			extracted && typeof extracted === "object"
+				? extracted
+				: result && typeof result === "object" && result.response && typeof result.response === "object"
+					? result.response
+					: result && typeof result === "object" && result.result && typeof result.result === "object"
+						? result.result
+						: null;
 
 		return {
 			available: true,
 			model,
-			result: parsed || { summary: text }
+			result: parsed || {
+				summary: fallbackText || "پاسخ AI دریافت شد اما متن قابل استخراج نبود.",
+				raw: result ?? null
+			}
 		};
 	} catch (error) {
 		return {
