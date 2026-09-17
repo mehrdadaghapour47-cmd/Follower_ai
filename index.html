@@ -645,7 +645,8 @@ ${getValue("extra") || "وارد نشده"}
 async function callAI(
 prompt,
 button,
-loadingText
+loadingText,
+endpoint = "/api/audit"
 ){
 
 setLoading(
@@ -663,7 +664,7 @@ setStatus(
 try{
 
 const response =
-await fetch(API_URL + "/api/audit", {
+await fetch(API_URL + endpoint, {
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -874,7 +875,8 @@ ${profile}
 await callAI(
 prompt,
 analyzeButton,
-"⏳ در حال تحلیل پیج..."
+"⏳ در حال تحلیل پیج...",
+"/api/audit"
 );
 
 }
@@ -930,7 +932,8 @@ ${profile}
 await callAI(
 prompt,
 reelButton,
-"⏳ در حال ساخت ایده ریلز..."
+"⏳ در حال ساخت ایده ریلز...",
+"/api/reel-ideas"
 );
 
 }
@@ -977,7 +980,8 @@ ${profile}
 await callAI(
 prompt,
 planButton,
-"⏳ در حال ساخت برنامه ۷ روزه..."
+"⏳ در حال ساخت برنامه ۷ روزه...",
+"/api/plan"
 );
 
 }

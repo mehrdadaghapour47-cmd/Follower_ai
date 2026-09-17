@@ -63,6 +63,31 @@ test("keeps the prompt response contract", async () => {
   assert.deepEqual(await response.json(), { success: true, response: "پاسخ آزمایشی" });
 });
 
+test("supports strategy, reel ideas, and content plan endpoints", async () => {
+  const aiEnv = {
+    ...env,
+    AI: { run: async () => ({ response: '{"summary":"ok"}' }) }
+  };
+
+  for (const path of ["/api/strategy", "/api/reel-ideas", "/api/plan"]) {
+    const response = await worker.fetch(new Request(`https://worker.test${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        input: "بدنسازی و آمادگی جسمانی",
+        profile: { username: "firefighter_fitness", followers_count: 2126 },
+        content: "تمرین بدنسازی و آمادگی جسمانی"
+      })
+    }), aiEnv);
+
+    assert.equal(response.status, 200, `${path} should return 200`);
+    const result = await response.json();
+    assert.equal(result.success, true, `${path} should succeed`);
+    assert.equal(result.ai, true, `${path} should use AI`);
+    assert.equal(result.endpoint, path.replace("/api/", ""));
+  }
+});
+
 test("validates Meta HMAC signatures", async () => {
   const body = JSON.stringify({ hello: "world" });
   const signature = `sha256=${createHmac("sha256", "app-secret").update(body).digest("hex")}`;

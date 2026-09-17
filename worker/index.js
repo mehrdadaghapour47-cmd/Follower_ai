@@ -256,6 +256,75 @@ const worker = {
       }, { status: 200 }, request, env);
     }
 
+    if (url.pathname === "/api/strategy") {
+      if (request.method !== "POST") {
+        return jsonResponse({ success: false, error: "METHOD_NOT_ALLOWED" }, { status: 405 }, request, env);
+      }
+
+      const payload = await request.json().catch(() => ({}));
+      const aiResult = await analyzeWithAI(env, {
+        task: "strategy",
+        input: payload?.input || "",
+        profile: payload?.profile || {},
+        content: payload?.content || "",
+        instruction: "به فارسی یک استراتژی رشد هدفمند اینستاگرام برای جذب فالوور واقعی ارائه بده. شامل مشکل اصلی، مخاطب هدف، ستون‌های محتوا، CTA، روش افزایش تعامل و اقدامات فوری باشد. فقط از داده‌های داده‌شده استفاده کن."
+      });
+
+      return jsonResponse({
+        success: true,
+        endpoint: "strategy",
+        ai: Boolean(aiResult?.available),
+        model: aiResult?.model || null,
+        result: aiResult?.result || null
+      }, {}, request, env);
+    }
+
+    if (url.pathname === "/api/reel-ideas") {
+      if (request.method !== "POST") {
+        return jsonResponse({ success: false, error: "METHOD_NOT_ALLOWED" }, { status: 405 }, request, env);
+      }
+
+      const payload = await request.json().catch(() => ({}));
+      const aiResult = await analyzeWithAI(env, {
+        task: "reel-ideas",
+        input: payload?.input || "",
+        profile: payload?.profile || {},
+        content: payload?.content || "",
+        instruction: "به فارسی 5 ایده ریلز هدفمند برای جذب فالوور واقعی بده. برای هر ایده هوک، ساختار کوتاه ویدئو، متن روی تصویر، CTA و روش افزایش اشتراک‌گذاری و ذخیره را مشخص کن. اطلاعاتی که داده نشده را اختراع نکن."
+      });
+
+      return jsonResponse({
+        success: true,
+        endpoint: "reel-ideas",
+        ai: Boolean(aiResult?.available),
+        model: aiResult?.model || null,
+        result: aiResult?.result || null
+      }, {}, request, env);
+    }
+
+    if (url.pathname === "/api/plan") {
+      if (request.method !== "POST") {
+        return jsonResponse({ success: false, error: "METHOD_NOT_ALLOWED" }, { status: 405 }, request, env);
+      }
+
+      const payload = await request.json().catch(() => ({}));
+      const aiResult = await analyzeWithAI(env, {
+        task: "weekly-plan",
+        input: payload?.input || "",
+        profile: payload?.profile || {},
+        content: payload?.content || "",
+        instruction: "به فارسی یک برنامه محتوایی 7 روزه اینستاگرام بساز. برای هر روز موضوع، نوع محتوا، ایده ریلز یا پست، هوک، CTA، استوری، هدف و روش تعامل را مشخص کن."
+      });
+
+      return jsonResponse({
+        success: true,
+        endpoint: "plan",
+        ai: Boolean(aiResult?.available),
+        model: aiResult?.model || null,
+        result: aiResult?.result || null
+      }, {}, request, env);
+    }
+
     return jsonResponse({ success: false, error: "Not found" }, { status: 404 }, request, env);
   }
 };
