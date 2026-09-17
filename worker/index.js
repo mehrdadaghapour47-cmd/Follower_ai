@@ -221,12 +221,21 @@ const worker = {
       if (aiResult?.available) {
         const result = aiResult.result;
 
-        if (typeof result === "string") {
-          response = result;
-        } else if (result?.summary) {
-          response = String(result.summary);
+        if (typeof result === "string" && result.trim()) {
+          response = result.trim();
+        } else if (result?.summary && String(result.summary).trim()) {
+          response = String(result.summary).trim();
         } else if (result && typeof result === "object") {
-          response = JSON.stringify(result, null, 2);
+          const values = Object.values(result)
+            .filter((value) => value !== null && value !== undefined)
+            .map((value) =>
+              typeof value === "string" ? value.trim() : JSON.stringify(value)
+            )
+            .filter(Boolean);
+
+          if (values.length) {
+            response = values.join("\n\n");
+          }
         }
       }
 
