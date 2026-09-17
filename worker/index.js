@@ -98,7 +98,11 @@ const worker = {
           return jsonResponse({ success: true, response: "AI binding unavailable" }, { status: 200 }, request, env);
         }
 
-        return jsonResponse({ success: true, response: aiResult.result?.summary || JSON.stringify(aiResult.result) }, { status: 200 }, request, env);
+        const responseText = typeof aiResult.result === "string"
+          ? aiResult.result
+          : aiResult.result?.summary || JSON.stringify(aiResult.result);
+
+        return jsonResponse({ success: true, response: responseText }, { status: 200 }, request, env);
       }
 
       return jsonResponse({ success: true, message: "🔥 Follower AI is online", ai: Boolean(env.AI) }, { status: 200 }, request, env);
