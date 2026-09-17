@@ -118,3 +118,41 @@ test("uses connected Instagram data in audits", async () => {
     globalThis.fetch = originalFetch;
   }
 });
+
+test("adds AI response details to audit results when available", async () => {
+  const originalFetch = globalThis.fetch;
+  const connectedEnv = {
+    ...env,
+    META_ACCESS_TOKEN: "secret-token",
+    META_INSTAGRAM_ACCOUNT_ID: "17841400000000000",
+    META_PERMISSIONS: "instagram_basic,pages_show_list,pages_read_engagement",
+    AI: {
+      run: async () => ({ response: '{"summary":"AI summary for audit"}' })
+    }
+  };
+  globalThis.fetch = async (url) => {
+    if (url.includes("/media?")) return new Response(JSON.stringify({ data: [] }), { status: 200 });
+    return new Response(JSON.stringify({
+      id: "17841400000000000",
+      username: "connected_account",
+      biography: "A connected Instagram profile biography that is long enough"
+    }), { status: 200 });
+  };
+
+  try {
+    const response = await worker.fetch(new Request("https://worker.test/api/audit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input: "connected_account", profile: { username: "manual", bio: "manual" } })
+    }), connectedEnv);
+    const result = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(result.ai, true);
+    assert.equal(result.response, "AI summary for audit");
+    assert.equal(result.model, "@cf/zai-org/glm-4.7-flash");
+    assert.equal(result.integration.instagram.status, "connected");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

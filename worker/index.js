@@ -176,6 +176,7 @@ const worker = {
 
       const input = payload?.input || payload?.profile?.username || "";
       const profile = payload?.profile || {};
+      const content = payload?.content || profile?.bio || "";
       const validated = validateInstagramInput(input || profile.username || "");
       const baseAudit = {
         integration: {
@@ -207,7 +208,43 @@ const worker = {
         }
       }
 
-      return jsonResponse(baseAudit, { status: 200 }, request, env);
+      const aiResult = await analyzeWithAI(env, {
+        input,
+        profile,
+        content,
+        audit: baseAudit.audit,
+        integration: baseAudit.integration,
+        coverage: baseAudit.coverage
+      });
+
+      let response = "";
+      if (aiResult?.available) {
+        const result = aiResult.result;
+
+        if (typeof result === "string") {
+          response = result;
+        } else if (result?.summary) {
+          response = String(result.summary);
+        } else if (result && typeof result === "object") {
+          response = JSON.stringify(result, null, 2);
+        }
+      }
+
+      if (!response) {
+        response =
+          `تحلیل پایه Follower AI 2.0\n\n` +
+          `امتیاز پروفایل: ${baseAudit.audit.profile.score}/100\n` +
+          `وضعیت اینستاگرام: ${baseAudit.integration.instagram.status}\n\n` +
+          "برای تحلیل دقیق‌تر، داده‌های بیشتری وارد کنید.";
+      }
+
+      return jsonResponse({
+        success: true,
+        response,
+        ai: Boolean(aiResult?.available),
+        model: aiResult?.model || null,
+        ...baseAudit
+      }, { status: 200 }, request, env);
     }
 
     return jsonResponse({ success: false, error: "Not found" }, { status: 404 }, request, env);
