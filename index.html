@@ -557,6 +557,71 @@ message;
 }
 
 
+function formatAIResult(value){
+
+if(typeof value === "string") return value.trim();
+
+if(!value || typeof value !== "object") return String(value ?? "");
+
+const lines = [];
+
+const add = (title, value) => {
+
+if(Array.isArray(value) && value.length){
+
+lines.push("\n" + title);
+
+value.forEach((item, index) => {
+
+if(typeof item === "string"){
+
+lines.push((index + 1) + ". " + item);
+
+}else if(item && typeof item === "object"){
+
+const parts = Object.entries(item)
+.filter(([_, itemValue]) => itemValue !== null && itemValue !== undefined && itemValue !== "")
+.map(([key, itemValue]) => key + ": " + (Array.isArray(itemValue) ? itemValue.join("، ") : itemValue));
+
+lines.push((index + 1) + ". " + parts.join(" | "));
+
+}
+
+});
+
+return;
+
+}
+
+if(typeof value === "string" && value.trim()){
+
+lines.push(title + "\n" + value.trim());
+
+}
+
+};
+
+add("🔎 تشخیص", value.diagnosis);
+add("👥 مخاطب هدف", value.audience);
+add("🧱 ستون‌های محتوا", value.content_pillars);
+add("🎬 استراتژی ریلز", value.reel_strategy);
+add("📅 برنامه هفتگی", value.weekly_plan || value.days);
+add("🪝 Hookها", value.hooks);
+add("📣 CTA", value.cta);
+add("💬 اقدامات تعامل", value.engagement_actions);
+add("📊 شاخص‌ها", value.metrics);
+add("⚠️ محدودیت‌ها", value.limitations);
+add("💡 ایده‌ها", value.ideas);
+add("📌 راهنمای انتشار", value.posting_guidance);
+add("❗ نقاط قوت", value.strengths);
+add("❌ نقاط ضعف", value.weaknesses);
+add("🚀 اولویت‌ها", value.priorities);
+
+return lines.join("\n") || JSON.stringify(value, null, 2);
+
+}
+
+
 function showResult(text){
 
 resultBox.classList.add("show");
@@ -733,6 +798,7 @@ data.error ||
 
 
 let answer =
+data.result ??
 data.response;
 
 
@@ -753,11 +819,7 @@ answer.response;
 }else{
 
 answer =
-JSON.stringify(
-answer,
-null,
-2
-);
+formatAIResult(answer);
 
 }
 
